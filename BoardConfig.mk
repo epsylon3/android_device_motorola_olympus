@@ -135,3 +135,7 @@ BOARD_HAS_LARGE_FILESYSTEM := true
 
 # Dock Audio
 BOARD_USE_MOTO_DOCK_HACK := true
+
+# Custom squisher, final step script
+TARGET_CUSTOM_RELEASETOOL := ./device/motorola/olympus/releasetools/squisher
+

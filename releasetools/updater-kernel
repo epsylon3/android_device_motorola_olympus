@@ -1,0 +1,15 @@
+assert(package_extract_file("recovery.img", "/tmp/recovery.img"),
+       write_raw_image("/tmp/recovery.img", "/dev/block/mmcblk0p10"),
+       delete("/tmp/recovery.img"));
+assert(package_extract_file("boot.img", "/tmp/boot.img"),
+       write_raw_image("/tmp/boot.img", "/dev/block/mmcblk0p11"),
+       delete("/tmp/boot.img"));
+assert(package_extract_file("devtree.img", "/tmp/devtree.img"),
+       write_raw_image("/tmp/devtree.img", "/dev/block/mmcblk0p6"),
+       delete("/tmp/devtree.img"));
+
+mount("ext4", "EMMC", "/dev/block/mmcblk0p16", "/data");
+delete_recursive("/data/dalvik-cache");
+
+show_progress(0.100000, 0);
+
