@@ -139,3 +139,14 @@ BOARD_USE_MOTO_DOCK_HACK := true
 # Custom squisher, final step script
 TARGET_CUSTOM_RELEASETOOL := ./device/motorola/olympus/releasetools/squisher
 
+# Bootmenu
+TARGET_RECOVERY_PIXEL_FORMAT := "RGB_565"
+#TARGET_RECOVERY_PRE_COMMAND := "/system/bootmenu/script/reboot_command.sh"
+#TARGET_RECOVERY_PRE_COMMAND_CLEAR_REASON := true
+BOARD_USES_BOOTMENU := true
+BOARD_BOOTMODE_CONFIG_FILE := /cache/recovery/bootmode.conf
+BOARD_NEVER_UMOUNT_SYSTEM := true
+TARGET_NEEDS_MOTOROLA_HIJACK := true
+BOARD_HAS_SMALL_RECOVERY := true
+BOARD_HAS_NO_SELECT_BUTTON := true
+

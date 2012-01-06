@@ -1,14 +1,24 @@
 on init
-
-    loglevel 8
-
     export PHONE_STORAGE /mnt/emmc
     # create mountpoints for internal "SD"
     mkdir /mnt/emmc 0000 system system
     # battery driver permissions
     mkdir /pds 0755 root root
     mkdir /osh 0000 root root
-    # create mountpoints for host mode storage
+
+on fs
+# mount mtd partitions
+    # Mount /system rw first to give the filesystem a chance to save a checkpoint
+    mount ext4 /dev/block/mmcblk0p12 /system noatime nodiratime wait ro barrier=1
+    mount ext4 /dev/block/mmcblk0p16 /data nosuid nodev noatime nodiratime wait barrier=1 noauto_da_alloc
+    mount ext4 /dev/block/mmcblk0p15 /cache nosuid nodev noatime nodiratime wait barrier=1 noauto_da_alloc
+    mount ext4 /dev/block/mmcblk0p13 /osh nodev noatime nodiratime wait barrier=1 noauto_da_alloc
+
+    exec /system/bin/logwrapper /system/bin/pds_perm_fix.sh
+
+on post-fs
+    symlink /system/lib /vendor/lib
+    # once everything is setup, no need to modify /
     mkdir /mnt/usbdisk_1.0 0000 system system
     mkdir /mnt/usbdisk_1.1 0000 system system
     mkdir /mnt/usbdisk_1.2 0000 system system
@@ -17,61 +27,6 @@ on init
     mkdir /mnt/usbdisk_1.5 0000 system system
     mkdir /mnt/usbdisk_1.6 0000 system system
     mkdir /mnt/usbdisk_1.7 0000 system system
-
-    # busybox history for "adb shell"
-    export HISTFILE /cache/bootmenu/.ash_history
-    export HISTFILESIZE 1000
-    export ENV /system/etc/profile
-
-    # nvrm permissions
-    chmod 666 /dev/nvrm
-
-    # knvrm permissions
-    chmod 660 /dev/knvrm
-    chown root system /dev/knvrm
-
-    # nvrpc permissions
-    chmod 666 /dev/nvrpc
-
-    # nvmap permissions
-    chmod 666 /dev/nvmap
-
-    # nvos/knvos permissions
-    chmod 660 /dev/knvos
-    chown root system /dev/knvos
-    chmod 666 /dev/nvos
-
-    # nvhost permissions
-    chmod 666 /dev/nvhost-ctrl
-    chmod 666 /dev/nvhost-display
-    chmod 666 /dev/nvhost-gr3d
-    chmod 666 /dev/nvhost-gr2d
-    chmod 666 /dev/nvhost-dsi
-    chmod 666 /dev/nvhost-isp
-    chmod 666 /dev/nvhost-mpe
-    chmod 666 /dev/nvhost-vi
-
-    # make framebuffer accessible
-    chmod 660 /dev/graphics/fb0
-
-    # USB3 IPC permissions
-    chmod 0660 /dev/ttyUSB1
-
-on fs
-# mount mtd partitions
-    # Mount /system rw first to give the filesystem a chance to save a checkpoint
-    mount ext4 /dev/block/mmcblk0p12 /system noatime nodiratime wait ro barrier=1
-    mount ext4 /dev/block/mmcblk0p15 /cache nosuid nodev noatime nodiratime wait barrier=1 noauto_da_alloc
-
-    exec /system/bin/logwrapper /system/bin/bootmenu
-
-    mount ext4 /dev/block/mmcblk0p16 /data nosuid nodev noatime nodiratime wait barrier=1 noauto_da_alloc
-    mount ext4 /dev/block/mmcblk0p13 /osh nodev noatime nodiratime wait barrier=1 noauto_da_alloc
-
-    exec /system/bin/logwrapper /system/bin/pds_perm_fix.sh
-
-on post-fs
-    # once everything is setup, no need to modify /
     mount rootfs rootfs / ro remount
 
     # We chown/chmod /data again so because mount is run as root + defaults
@@ -121,9 +76,6 @@ on post-fs
     chown root system /proc/sysrq-trigger
     chmod 0220 /proc/sysrq-trigger
 
-    # Dont delete this line, used as event in bootmenu (cpu settings & postbootmenu)
-    exec /system/bin/logwrapper postbootmenu
-
 on boot
     # nvrm permissions
     chmod 666 /dev/nvrm
@@ -156,7 +108,7 @@ on boot
     # make framebuffer accessible
     chmod 660 /dev/graphics/fb0
 
-    # USB3 IPC permissions
+    #  USB3 IPC permissions
     chmod 0660 /dev/ttyUSB1
 
     # nvodmcam permissions
@@ -205,12 +157,7 @@ on boot
     chown root system /sys/devices/platform/reg-virt-sw5/enabled
 
     # sdcard tweaks
-    write /sys/block/mmcblk1/bdi/read_ahead_kb 1024
-
-    # enable kms
-    write /sys/kernel/mm/ksm/sleep_millisecs 1400
-    write /sys/kernel/mm/ksm/pages_to_scan 200
-    write /sys/kernel/mm/ksm/run 1
+    write /sys/block/mmcblk1/bdi/read_ahead_kb 4096
 
     # create the necessary dirs for tpapi with proper permission
     mkdir /data/tpapi
@@ -320,18 +267,18 @@ on boot
     chmod 660 /dev/akm8975_aot
 # atvc stuff
 # Define Motorola DBVC ATVC Property defaults (failsafe properties)
-    setprop ro.sys.atvc_allow_netmon_usb 0
-    setprop ro.sys.atvc_allow_netmon_ih 0
-    setprop ro.sys.atvc_allow_res_core 0
-    setprop ro.sys.atvc_allow_res_panic 0
-    setprop ro.sys.atvc_allow_all_adb 0
-    setprop ro.sys.atvc_allow_all_core 0
-    setprop ro.sys.atvc_allow_efem 0
-    setprop ro.sys.atvc_allow_bp_log 0
-    setprop ro.sys.atvc_allow_ap_mot_log 0
-    setprop ro.sys.atvc_allow_gki_log 0
-    mkdir /data/atvc 0775 system shell
-    chown system shell /data/atvc
+       setprop ro.sys.atvc_allow_netmon_usb 0
+       setprop ro.sys.atvc_allow_netmon_ih 0
+       setprop ro.sys.atvc_allow_res_core 0
+       setprop ro.sys.atvc_allow_res_panic 0
+       setprop ro.sys.atvc_allow_all_adb 0
+       setprop ro.sys.atvc_allow_all_core 0
+       setprop ro.sys.atvc_allow_efem 0
+       setprop ro.sys.atvc_allow_bp_log 0
+       setprop ro.sys.atvc_allow_ap_mot_log 0
+       setprop ro.sys.atvc_allow_gki_log 0
+       mkdir /data/atvc 0775 system shell
+       chown system shell /data/atvc
 
 # touchpad stuff
     chmod 660 /sys/class/misc/touchpad
@@ -343,18 +290,9 @@ on boot
 # Start services
     exec /system/bin/mot_boot_mode
 
-# triggered by holding down volume down, volume up and power
-service reboot_key /system/bin/reboot
-    user system
-    oneshot
-    keycodes 114 115 107
-    disabled
-
 service tcmd /system/bin/tcmd
     class post-zygote_services
-    # group option accepts at most 12 suppl. groups
-    group system radio input system camera graphics sdcard_rw audio inet bluetooth wifi net_admin
-    #group log compass cache mount net_bt_admin net_raw
+    group system radio input system log camera graphics sdcard_rw audio inet bluetooth wifi compass cache system mount net_bt_admin net_raw net_admin
     socket local_tcmd stream 0660 system system
     socket batch_socket stream 0600 system system
 
@@ -435,6 +373,17 @@ service nvrm_daemon /system/bin/logwrapper /system/bin/nvrm_daemon
     user root
     onrestart restart servicemanager
 
+service bt_start /system/bin/bt_init_wrapper.sh
+    user bluetooth
+    group bluetooth net_bt_admin net_raw net_admin misc
+    oneshot
+
+service bt_stop /system/bin/bt_init -stop
+    user bluetooth
+    group bluetooth net_bt_admin misc
+    disabled
+    oneshot
+
 service wpa_supplicant /system/bin/wpa_supplicant -D wext -i eth0 -c /data/misc/wifi/wpa_supplicant.conf
     class WLAN
     socket wpa_eth0 dgram 0660 wifi wifi
@@ -514,14 +463,11 @@ service map /system/bin/sdptool add --channel=20 MAP
     disabled
     oneshot
 
-service hciattach /system/bin/bt_init_wrapper.sh
+service hciattach /system/bin/hciattach_wrapper.sh
     user bluetooth
     group bluetooth net_bt_admin
-    disabled
     oneshot
-
-on property:init.svc.hciattach=stopping
-    exec /system/bin/bt_init -stop
+    disabled
 
 # This is product specific init script which will be appended to init.rc
 # after init.nv_common.rc. 
@@ -538,10 +484,13 @@ on early-boot
         setprop ro.EMPTY_APP_MEM 21000
 
 on boot
-	chown system system /dev/aes1750
+	chown system /dev/aes1750
+	chgrp system /dev/aes1750
 	chmod 0600 /dev/aes1750
-	chown system system /data/am2data.db
-	chown system system /data/am2data.db.meta
+	chown system /data/am2data.db
+	chown system /data/am2data.db.meta
+	chgrp system /data/am2data.db
+	chgrp system /data/am2data.db.meta
 
 # Enable ADB
 #   write /dev/usb_device_mode charge_adb
@@ -574,10 +523,17 @@ on boot
       setprop net.tcp.buffersize.gprs    4096,8192,12288,4096,8192,12288
 
 
+# ppp daemon used by DUN.
+service pppd /system/xbin/pppd silent ipparam dun plugin /system/lib/libpppd_plugin.so
+    class post-zygote_services
+    user root
+    disabled
+    oneshot
+
 # Fingerprint sensor daemon
 service am2server /system/bin/am2server
-    user system
-    group system inet input
+	user system
+	group system inet input
     class pre-zygote_services
 
 on device-added-/dev/ttyUSB0
