@@ -75,7 +75,7 @@ BOARD_HIJACK_RECOVERY_PATH := /preinstall/
 BOARD_HAS_PREINSTALL := true
 TARGET_NO_BOOT := false
 TARGET_NO_RECOVERY := false
-
+TARGET_RECOVERY_INITRC := ./device/motorola/olympus/recovery/init.rc
 BOARD_SDCARD_DEVICE_PRIMARY := /dev/block/mmcblk1p1
 BOARD_SDCARD_DEVICE_SECONDARY := /dev/block/mmcblk1
 #BOARD_SDCARD_DEVICE_INTERNAL := /dev/block/mmcblk0p18
