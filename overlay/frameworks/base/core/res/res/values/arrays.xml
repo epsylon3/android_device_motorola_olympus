@@ -22,8 +22,10 @@
         <item>@string/reboot_recovery</item>
         <item>@string/reboot_fastboot</item>
         <item>@string/reboot_bootmenu</item>
+<!-- disabled until minui fix
         <item>Bootmenu Recovery</item>
         <item>Bootmenu Shell</item>
+-->
     </array>
 
     <!-- Do not translate. Defines the shutdown actions passed to the kernel.
@@ -33,7 +35,9 @@
         <item>recovery</item>
         <item>fastboot</item>
         <item>bootmenu</item>
+<!-- disabled until minui fix
         <item>bootmenu recovery</item>
         <item>bootmenu shell</item>
+-->
     </string-array>
 </resources>
