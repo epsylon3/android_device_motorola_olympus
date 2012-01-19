@@ -22,15 +22,16 @@
 
 char* MENU_HEADERS[] = { NULL };
 
-char* MENU_ITEMS[] = { "reboot system now",
-                       "apply update from sdcard",
-                       "wipe data/factory reset",
-                       "wipe cache partition",
-                       "install zip from sdcard",
-                       "backup and restore",
-                       "mounts and storage",
-                       "advanced",
-                       "power off",
+char* MENU_ITEMS[] = { "Reboot system now",
+                       "Apply update from sdcard",
+                       "Wipe data/factory reset",
+                       "Wipe cache partition",
+                       "Install zip from sdcard or emmc",
+                       "Backup and restore",
+                       "Mounts and storage",
+                       "Advanced",
+                       "Power off",
+                       "Switch to bootmenu",
                        NULL };
 
 int device_recovery_start() {
@@ -38,35 +39,47 @@ int device_recovery_start() {
 }
 
 int device_toggle_display(volatile char* key_pressed, int key_code) {
-        return 0;
+    return 0;
 }
 
 int device_reboot_now(volatile char* key_pressed, int key_code) {
     return 0;
 }
 
+// check for constants in bionic/libc/kernel/common/linux/input.h
+
 int device_handle_key(int key_code, int visible) {
     if (visible) {
         switch (key_code) {
+            case KEY_SLASH:
             case KEY_CAPSLOCK:
             case KEY_DOWN:
             case KEY_VOLUMEDOWN:
-            case KEY_MENU:
                 return HIGHLIGHT_DOWN;
 
+            case KEY_COMMA:
             case KEY_LEFTSHIFT:
             case KEY_UP:
             case KEY_VOLUMEUP:
-            case KEY_HOME:
                 return HIGHLIGHT_UP;
 
+            case KEY_S:
+            case KEY_LEFTBRACE:
+            case BTN_MOUSE:
+            case KEY_CAMERA:
+            case KEY_F21:
             case KEY_SEND:
-            case KEY_END:
+            case KEY_ENTER:
+            case KEY_MENU:
             case KEY_POWER:
-            case KEY_SEARCH:
-                    return SELECT_ITEM;
+            case KEY_END:
+            case KEY_MEDIA:
+                return SELECT_ITEM;
+
+            case KEY_BACKSPACE:
             case KEY_BACK:
-                return GO_BACK;
+                if (!get_allow_toggle_display())
+                    return GO_BACK;
         }
     }
 
