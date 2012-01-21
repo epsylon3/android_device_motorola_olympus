@@ -8,7 +8,16 @@ if [ -f /system/bin/bootmenu ]; then
     /system/bin/logwrapper /system/bin/bootmenu
 
     /system/bin/toolbox stop recovery
-    exit
+
+    if [ -L /sbin/busybox ]; then
+        rm /sbin/busybox
+        # replace recovery symlink by full static busybox bootmenu version
+        /system/bootmenu/binary/busybox cp /system/bootmenu/binary/busybox /sbin/busybox
+
+        # keep recovery binary, for extra tools
+        # rm /sbin/recovery
+    fi
+    exit 0
 fi
 
 # fast button warning
