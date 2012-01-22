@@ -487,12 +487,13 @@ service pppd /system/bin/pppd silent ipparam dun plugin /system/lib/libpppd_plug
     disabled
     oneshot
 
-service map /system/bin/sdptool add --channel=20 MAP
-    class post-zygote_services
-    user bluetooth
-    group bluetooth net_bt_admin
-    disabled
-    oneshot
+# ignored, already in init.rc
+#service map /system/bin/sdptool add --channel=20 MAP
+#    class post-zygote_services
+#    user bluetooth
+#    group bluetooth net_bt_admin
+#    disabled
+#    oneshot
 
 service hciattach /system/bin/bt_init_wrapper.sh
     user bluetooth
@@ -518,8 +519,6 @@ on early-boot
         setprop ro.EMPTY_APP_MEM 21000
 
 on boot
-	chown system system /dev/aes1750
-	chmod 0600 /dev/aes1750
 	chown system system /data/am2data.db
 	chown system system /data/am2data.db.meta
 
