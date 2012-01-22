@@ -2,9 +2,17 @@ on init
 
     loglevel 8
 
+    # partitions helpers
+    symlink /dev/block/mmcblk0p12 /dev/block/system
+    symlink /dev/block/mmcblk0p15 /dev/block/cache
+    symlink /dev/block/mmcblk0p16 /dev/block/data
+    symlink /dev/block/mmcblk0p13 /dev/block/osh
+    symlink /dev/block/mmcblk0p9 /dev/block/kpanic
+
     export PHONE_STORAGE /mnt/emmc
     # create mountpoints for internal "SD"
     mkdir /mnt/emmc 0000 system system
+
     # battery driver permissions
     mkdir /pds 0755 root root
     mkdir /osh 0000 root root
@@ -21,7 +29,10 @@ on init
     # busybox history for "adb shell"
     export HISTFILE /cache/bootmenu/.ash_history
     export HISTFILESIZE 1000
-    export ENV /system/etc/profile
+    export ENV /etc/profile
+
+    #############################
+    # devfs and sysfs permissions
 
     # nvrm permissions
     chmod 666 /dev/nvrm
@@ -51,15 +62,37 @@ on init
     chmod 666 /dev/nvhost-mpe
     chmod 666 /dev/nvhost-vi
 
+    chmod 660 /dev/nvaes
+    chown system system /dev/nvaes
+    chown system system /dev/aes1750
+    chmod 600 /dev/aes1750
+
     # make framebuffer accessible
     chmod 660 /dev/graphics/fb0
 
-    # USB3 IPC permissions
-    chmod 0660 /dev/ttyUSB1
+    # vibrator permissions
+    chmod 664 /sys/class/timed_output/vibrator/enable
+
+    # input devices
+    chmod 660 /sys/class/misc/touchpad
+    chown compass compass /sys/bus/i2c/drivers/qtouch-obp-ts/0-004a/irqStatus
+
+    # sensor interface
+    chown compass compass /dev/kxtf9
+    chmod 660 /dev/kxtf9
+    chown compass compass /dev/isl29030
+    chmod 660 /dev/isl29030
+    chown compass compass /dev/akm8975_dev
+    chmod 660 /dev/akm8975_dev
+    chown compass compass /dev/akm8975_aot
+    chmod 660 /dev/akm8975_aot
+
+    # kept for old kernels compat ?
+    chown compass compass /dev/akm8975
+    chmod 660 /dev/akm8975
 
 on fs
-# mount mtd partitions
-    # Mount /system rw first to give the filesystem a chance to save a checkpoint
+    # mount mtd partitions
     mount ext4 /dev/block/mmcblk0p12 /system noatime nodiratime wait ro barrier=1
     mount ext4 /dev/block/mmcblk0p15 /cache nosuid nodev noatime nodiratime wait barrier=1 noauto_da_alloc
 
@@ -81,14 +114,17 @@ on post-fs
     # Create dump dir and collect dumps.
     # Do this before we mount cache so eventually we can use cache for
     # storing dumps on platforms which do not have a dedicated dump partition.
-   
+  
+    # Collect apanic data to kpanic mmc
+    write /proc/apanic /dev/block/kpanic
+ 
     mkdir /data/dontpanic
     chown root log /data/dontpanic
     chmod 0750 /data/dontpanic
 
-    # Collect apanic data, free resources and re-arm trigger
-
-    write /proc/apanic /dev/block/mmcblk0p9
+    copy /proc/apanic_annotate /data/dontpanic/apanic_annotate
+    chown root log /data/dontpanic/apanic_annotate
+    chmod 0640 /data/dontpanic/apanic_annotate
 
     copy /proc/apanic_console /data/dontpanic/apanic_console
     chown root log /data/dontpanic/apanic_console
@@ -125,37 +161,6 @@ on post-fs
     exec /system/bin/logwrapper postbootmenu
 
 on boot
-    # nvrm permissions
-    chmod 666 /dev/nvrm
-
-    # knvrm permissions
-    chmod 660 /dev/knvrm
-    chown root system /dev/knvrm
-
-    # nvrpc permissions
-    chmod 666 /dev/nvrpc
-
-    # nvmap permissions
-    chmod 666 /dev/nvmap
-
-    # nvos/knvos permissions
-    chmod 660 /dev/knvos
-    chown root system /dev/knvos
-    chmod 666 /dev/nvos
-
-    # nvhost permissions
-    chmod 666 /dev/nvhost-ctrl
-    chmod 666 /dev/nvhost-display
-    chmod 666 /dev/nvhost-gr3d
-    chmod 666 /dev/nvhost-gr2d
-    chmod 666 /dev/nvhost-dsi
-    chmod 666 /dev/nvhost-isp
-    chmod 666 /dev/nvhost-mpe
-    chmod 666 /dev/nvhost-vi
-
-    # make framebuffer accessible
-    chmod 660 /dev/graphics/fb0
-
     # USB3 IPC permissions
     chmod 0660 /dev/ttyUSB1
 
@@ -225,9 +230,6 @@ on boot
     chown system system /data/tpapi/etc
     chown system system /data/tpapi/etc/tpa
     chown system system /data/tpapi/etc/tpa/persistent
-
-    chmod 0660 /dev/nvaes
-    chown system system /dev/nvaes
 
     # for feature 33302 device encryption
     mkdir /data/emt
@@ -303,21 +305,6 @@ on boot
     mkdir /system/etc/motorola/com.motorola.blur.setup 0771 system shell
     chown system shell /system/etc/motorola/com.motorola.blur.setup
 
-    # vibrator permissions
-    chmod 0664 /sys/class/timed_output/vibrator/enable
-
-    # sensor interface
-
-    chown compass compass /dev/kxtf9
-    chmod 660 /dev/kxtf9
-    chown compass compass /dev/akm8975
-    chmod 660 /dev/akm8975
-    chown compass compass /dev/isl29030
-    chmod 660 /dev/isl29030
-    chown compass compass /dev/akm8975_dev
-    chmod 660 /dev/akm8975_dev
-    chown compass compass /dev/akm8975_aot
-    chmod 660 /dev/akm8975_aot
 # atvc stuff
 # Define Motorola DBVC ATVC Property defaults (failsafe properties)
     setprop ro.sys.atvc_allow_netmon_usb 0
@@ -333,18 +320,11 @@ on boot
     mkdir /data/atvc 0775 system shell
     chown system shell /data/atvc
 
-# touchpad stuff
-    chmod 660 /sys/class/misc/touchpad
-    chown compass compass /sys/bus/i2c/drivers/qtouch-obp-ts/0-004a/irqStatus
-
-# Load Authentec VPN kernel module
-    insmod /system/lib/vpnclient.ko
-
 # Start services
     exec /system/bin/mot_boot_mode
 
 # triggered by holding down volume down, volume up and power
-service reboot_key /system/bin/reboot
+service reboot_key /system/bin/toolbox reboot
     user system
     oneshot
     keycodes 114 115 107
@@ -542,9 +522,6 @@ on boot
 	chmod 0600 /dev/aes1750
 	chown system system /data/am2data.db
 	chown system system /data/am2data.db.meta
-
-# Enable ADB
-#   write /dev/usb_device_mode charge_adb
 
 # Adjust Android LMK
     write /sys/module/lowmemorykiller/parameters/minfree 3072,4608,7200,11776,17408,21000
