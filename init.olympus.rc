@@ -87,10 +87,6 @@ on init
     chown compass compass /dev/akm8975_aot
     chmod 660 /dev/akm8975_aot
 
-    # kept for old kernels compat ?
-    chown compass compass /dev/akm8975
-    chmod 660 /dev/akm8975
-
 on fs
     # mount mtd partitions
     mount ext4 /dev/block/mmcblk0p12 /system noatime nodiratime wait ro barrier=1
