@@ -64,9 +64,7 @@ key 38    L
 key 39    SEMICOLON
 key 40    APOSTROPHE
 key 14    DEL
-#BEGIN Moto:IKOLYMP-5280_a22335:mapped USB keyboard delete key to backspace
 key 111   DEL
-#END IKOLYMP-5280
         
 key 44    Z
 key 45    X
@@ -111,18 +109,15 @@ key 98    SLASH
 key 96    ENTER
 key 58    SHIFT_LEFT          CAPS_LOCK
 
-key 164   MEDIA_PLAY_PAUSE    WAKE
-key 166   MEDIA_STOP          WAKE
 key 163   MEDIA_NEXT          WAKE
+key 164   MEDIA_PLAY_PAUSE    WAKE
 key 165   MEDIA_PREVIOUS      WAKE
+key 166   MEDIA_STOP          WAKE
 key 168   MEDIA_REWIND        WAKE
+key 159   MEDIA_FAST_FORWARD  WAKE
+key 226   MEDIA_PLAY_PAUSE    WAKE
 
-#BEGIN Moto:IKOLYMP-4986_krmt43:added mapping of ctrl key to MENU for webtop AIW
-key 29   MENU    WAKE_DROPPED
-key 97   MENU    WAKE_DROPPED
-key 63   SEARCH  WAKE_DROPPED
-#END
+key 29    MENU                WAKE_DROPPED
+key 97    MENU                WAKE_DROPPED
+key 63    SEARCH              WAKE_DROPPED
 
-#BEGIN Moto: IKOLYMP-6375
-key 226   MEDIA_POWER         WAKE
-#END Moto: IKOLYMP-6375

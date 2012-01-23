@@ -102,7 +102,9 @@ PRODUCT_COPY_FILES += \
     device/motorola/olympus/keylayout/usb_keyboard_102_en_us.kl:system/usr/keylayout/usb_keyboard_102_en_us.kl \
     device/motorola/olympus/keychars/usb_keyboard_102_en_us.kcm.bin:system/usr/keychars/usb_keyboard_102_en_us.kcm.bin \
     device/motorola/olympus/keylayout/usb_keyboard_102_en_us.kl:system/usr/keylayout/Motorola_Bluetooth_Wireless_Keyboard.kl \
-    device/motorola/olympus/keychars/usb_keyboard_102_en_us.kcm.bin:system/usr/keychars/Motorola_Bluetooth_Wireless_Keyboard.kcm.bin
+    device/motorola/olympus/keychars/usb_keyboard_102_en_us.kcm.bin:system/usr/keychars/Motorola_Bluetooth_Wireless_Keyboard.kcm.bin \
+    device/motorola/olympus/keylayout/Logitech_USB_Receiver.kl:system/usr/keylayout/Logitech_USB_Receiver.kl \
+    device/motorola/olympus/keychars/Logitech_USB_Receiver.kcm.bin:system/usr/keychars/Logitech_USB_Receiver.kcm.bin \
 
 # Permission files
 PRODUCT_COPY_FILES += \
