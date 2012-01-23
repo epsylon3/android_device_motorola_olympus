@@ -41,6 +41,9 @@ TARGET_ARCH_VARIANT_FPU := vfpv3-d16
 TARGET_CPU_SMP := true
 TARGET_HAVE_TEGRA_ERRATA_657451 := true
 
+# to fix lsof warnings
+COMMON_GLOBAL_CFLAGS += -DMOTOROLA_UIDS
+
 BOARD_CUSTOM_GRAPHICS := ../../../device/motorola/olympus/recovery/graphics.c
 BOARD_CUSTOM_RECOVERY_KEYMAPPING:= ../../device/motorola/olympus/recovery/recovery_ui.c
 BOARD_HAS_SDCARD_INTERNAL := true
