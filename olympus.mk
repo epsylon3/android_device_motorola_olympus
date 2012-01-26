@@ -67,6 +67,7 @@ $(call inherit-product-if-exists, vendor/motorola/olympus/olympus-vendor.mk)
 $(call inherit-product, build/target/product/full_base.mk)
 
 PRODUCT_PACKAGES += Usb \
+			RomUpdater \
 			DockAudio \
 			OlympusParts \
 			Torch \
