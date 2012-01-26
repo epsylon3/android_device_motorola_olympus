@@ -26,7 +26,7 @@
 /dev/android_adb_enable   0660   adb        adb
 /dev/ttyGS0               0660   root       system
 /dev/ttyMSM0              0600   bluetooth  bluetooth
-/dev/ttyHS0               0660   system     system
+/dev/ttyHS0               0664   system     system
 /dev/hidraw*              0660   root       system
 /dev/uinput               0660   system     bluetooth
 /dev/alarm                0664   system     radio
@@ -165,7 +165,7 @@
 /dev/sfh7743              0660   compass    compass
 /dev/isl29030             0660   compass    compass
 /dev/airc                 0660   compass    compass
-/dev/ttyS0                0640   radio      radio
+/dev/ttyS0                0666   shell      log
 /dev/ttyO0                0640   radio      radio
 # bluetooth uart
 /dev/ttyS1                0660   bluetooth  bluetooth
@@ -186,6 +186,12 @@
 /dev/rfcomm0              0600   system     system
 # touchpad related stuff
 /dev/touchpad             0770   root       system
+
+# other serial ports
+/dev/ttyHS2               0660   bluetooth  bluetooth
+/dev/ttyHS3               0660   radio      system
+/dev/ttyS*                0666   system     system
+/dev/ttyHS*               0666   system     system
 
 # sysfs properties
 /sys/devices/virtual/input/input*   enable      0660  root   input
