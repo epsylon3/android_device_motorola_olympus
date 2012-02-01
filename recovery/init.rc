@@ -1,5 +1,6 @@
 on early-init
     start ueventd
+    loglevel 8
 
 on init
     export PATH /sbin
@@ -22,11 +23,19 @@ on init
     mkdir /data
     mkdir /cache
     mkdir /osh
-    mount /tmp /tmp ramfs
+    mount ramfs /tmp /tmp
 
     mkdir /mnt
     symlink /sdcard /mnt/sdcard
     symlink /emmc /mnt/emmc
+
+on fs
+    # mount system partition to load touchpad
+    mount ext4 /dev/block/mmcblk0p12 /system noatime nodiratime wait ro barrier=1
+
+on post-fs
+    exec /sbin/cp -a /system/etc/touchpad /etc
+    exec /system/bin/touchpad -a
 
 on boot
 
@@ -35,6 +44,8 @@ on boot
     domainname localdomain
 
     setprop ro.product.device olympus
+
+    exec /sbin/umount /system
 
     class_start default
 
@@ -55,8 +66,7 @@ on property:persist.service.adb.enable=0
 
 # triggered by holding down volume down, volume up and power
 service reboot_key /sbin/reboot
-    user system
-    oneshot
-    keycodes 114 115 107
     disabled
+    keycodes 114 115 107
+    oneshot
 

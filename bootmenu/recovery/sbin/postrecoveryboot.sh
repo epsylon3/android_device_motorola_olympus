@@ -33,3 +33,18 @@ echo msc_adb > /dev/usb_device_mode
 sync
 
 # /sbin/adbd recovery &
+
+mount /dev/block/mmcblk0p12 /system
+
+# upload firmware to touch screen
+for i in $(seq 1 100); do
+    if [ -f /system/build.prop ]; then
+        break;
+    fi
+    usleep 500000
+done
+cp -a /system/etc/touchpad /etc/
+/system/bin/touchpad -a
+umount /system
+rm -Rf /etc/touchpad
+
