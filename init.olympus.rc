@@ -87,6 +87,11 @@ on init
     chown compass compass /dev/akm8975_aot
     chmod 660 /dev/akm8975_aot
 
+    # custom repeat delay (epsy kernel)
+    write /proc/tegra-kbc/repeat_cycle 6000
+    write /proc/tegra-kbc/repeat_delay 4096
+    write /proc/tegra-kbc/repoll_time 32
+
 on fs
     # mount mtd partitions
     mount ext4 /dev/block/mmcblk0p12 /system noatime nodiratime wait ro barrier=1
