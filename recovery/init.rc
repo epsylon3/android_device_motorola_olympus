@@ -29,9 +29,17 @@ on init
     symlink /sdcard /mnt/sdcard
     symlink /emmc /mnt/emmc
 
+    # partitions helpers
+    symlink /dev/block/mmcblk0p12 /dev/block/system
+    symlink /dev/block/mmcblk0p15 /dev/block/cache
+    symlink /dev/block/mmcblk0p16 /dev/block/data
+    symlink /dev/block/mmcblk0p13 /dev/block/osh
+    symlink /dev/block/mmcblk0p9 /dev/block/kpanic
+
 on fs
     # mount system partition to load touchpad
-    mount ext4 /dev/block/mmcblk0p12 /system noatime nodiratime wait ro barrier=1
+    exec /sbin/e2fsck -y /dev/block/system
+    mount ext4 /dev/block/system /system noatime nodiratime wait ro barrier=1
 
 on post-fs
     exec /sbin/cp -a /system/etc/touchpad /etc
@@ -54,7 +62,7 @@ on boot
     write /proc/tegra-kbc/repoll_time 32
 
     # in recovery, dmesg could report hung tasks (cpufreq-dvfsd)
-    echo 0 > /proc/sys/kernel/hung_task_timeout_secs
+    write /proc/sys/kernel/hung_task_timeout_secs 0
 
     class_start default
 
