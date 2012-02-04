@@ -1,0 +1,9 @@
+ui_print("Updating kernel...");
+assert(package_extract_file("boot.img", "/dev/block/mmcblk0p11"));
+
+ui_print("Wiping dalvik-cache");
+mount("ext4", "EMMC", "/dev/block/mmcblk0p16", "/data");
+delete_recursive("/data/dalvik-cache");
+
+show_progress(0.100000, 0);
+

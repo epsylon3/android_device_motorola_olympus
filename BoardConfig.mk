@@ -149,3 +149,9 @@ BOARD_USE_MOTO_DOCK_HACK := true
 BOARD_USES_AUDIO_LEGACY := true
 
 BOARD_MOBILEDATA_INTERFACE_NAME := "ppp0"
+
+# Custom squisher, final step script
+TARGET_CUSTOM_RELEASETOOL := ./device/motorola/olympus/releasetools/squisher
+
+# Bootmenu & recovery
+TARGET_RECOVERY_PIXEL_FORMAT := "RGB_565"

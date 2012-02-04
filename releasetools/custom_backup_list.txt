@@ -1,0 +1,4 @@
+lib/modules/dhd.ko
+lib/modules/evfwd.ko
+lib/modules/aev.ko
+bootmenu/config/overclock.conf
