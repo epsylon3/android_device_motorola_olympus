@@ -120,3 +120,13 @@ PRODUCT_BUILD_PROP_OVERRIDES += BUILD_UTC_DATE=0
 PRODUCT_NAME := generic_olympus
 PRODUCT_DEVICE := olympus
 PRODUCT_MODEL := MB860
+
+# Add DroidSSHd (dropbear) Management App - tpruvot/android_external_droidsshd @ github
+PRODUCT_PACKAGES += DroidSSHd dropbear dropbearkey sftp-server scp ssh
+PRODUCT_PACKAGES += RomUpdater
+
+# CM9 apps
+PRODUCT_PACKAGES += Trebuchet FileManager Torch CMStats
+
+$(call inherit-product-if-exists, device/motorola/olympus/bootmenu/bootmenu.mk)
+

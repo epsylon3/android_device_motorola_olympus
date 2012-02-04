@@ -52,5 +52,5 @@ cp $DEVICE_OUT/root/init $REPACK/ota/system/bootmenu/2nd-boot/
 cp $DEVICE_OUT/recovery/root/sbin/recovery $REPACK/ota/system/bootmenu/recovery/
 
 # use the static busybox in bootmenu, this helps a lot on incomplete roms and ics
-cp $DEVICE_OUT/utilities/logwrapper $REPACK/ota/system/bootmenu/binary/logwrapper.bin
+mv $REPACK/ota/system/bin/logwrapper $REPACK/ota/system/bootmenu/binary/logwrapper.bin
 cp $REPACK/ota/system/bootmenu/binary/logwrapper.bin $REPACK/ota/system/bin/
