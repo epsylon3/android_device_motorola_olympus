@@ -5,6 +5,8 @@ DEVICE_OUT=$ANDROID_BUILD_TOP/out/target/product/olympus
 DEVICE_TOP=$ANDROID_BUILD_TOP/device/motorola/olympus
 VENDOR_TOP=$ANDROID_BUILD_TOP/vendor/motorola/olympus
 
+echo "squisher.sh..."
+
 # Delete unwanted apps
 rm -f $REPACK/ota/system/app/RomManager.apk
 rm -f $REPACK/ota/system/xbin/irssi

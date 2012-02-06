@@ -1,0 +1,18 @@
+assert(getprop("ro.hardware") == "olympus" || getprop("ro.product.device") == "olympus" || getprop("ro.build.product") == "olympus" || getprop("ro.product.board") == "olympus");
+
+ui_print("Updating kernel modules");
+mount("ext4", "EMMC", "/dev/block/mmcblk0p12", "/system");
+show_progress(0.400000, 0);
+package_extract_dir("system", "/system");
+
+ui_print("Updating kernel...");
+assert(package_extract_file("boot.img", "/dev/block/mmcblk0p11"));
+ui_print("Updating recovery...");
+assert(package_extract_file("recovery.img", "/dev/block/mmcblk0p10"));
+
+ui_print("Wiping dalvik-cache");
+mount("ext4", "EMMC", "/dev/block/mmcblk0p16", "/data");
+delete_recursive("/data/dalvik-cache");
+
+show_progress(0.100000, 0);
+
