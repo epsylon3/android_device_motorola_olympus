@@ -199,4 +199,9 @@ cat $OUT/system/build.prop | grep ro.build.date=
 ls -l $OUTFILE
 echo
 
+if [ -x $DEVICE_TOP/releasetools/addons ]; then
+	$DEVICE_TOP/releasetools/addons kernel
+	$DEVICE_TOP/releasetools/addons recovery
+fi
+
 exit 0

@@ -1,0 +1,9 @@
+assert(getprop("ro.hardware") == "olympus" || getprop("ro.product.device") == "olympus" || getprop("ro.build.product") == "olympus" || getprop("ro.product.board") == "olympus");
+
+show_progress(0.500000, 0);
+
+ui_print("Updating recovery...");
+assert(package_extract_file("recovery.img", "/dev/block/mmcblk0p10"));
+
+show_progress(0.500000, 0);
+
