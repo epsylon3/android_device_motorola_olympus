@@ -1,0 +1,89 @@
+on early-init
+    start ueventd
+    loglevel 8
+
+on init
+    export PATH /sbin
+    export ANDROID_ROOT /system
+    export ANDROID_DATA /data
+    export EXTERNAL_STORAGE /sdcard
+
+    # busybox history for "adb shell"
+    export HISTFILE /cache/bootmenu/.ash_history
+    export HISTFILESIZE 1000
+    export ENV /etc/profile
+
+    symlink /system/etc /etc
+
+    mkdir /boot
+    mkdir /sdcard
+    mkdir /sd-ext
+    mkdir /emmc
+    mkdir /system
+    mkdir /data
+    mkdir /cache
+    mkdir /osh
+    mount ramfs /tmp /tmp
+
+    mkdir /mnt
+    symlink /sdcard /mnt/sdcard
+    symlink /emmc /mnt/emmc
+
+    # partitions helpers
+    symlink /dev/block/mmcblk0p12 /dev/block/system
+    symlink /dev/block/mmcblk0p15 /dev/block/cache
+    symlink /dev/block/mmcblk0p16 /dev/block/data
+    symlink /dev/block/mmcblk0p13 /dev/block/osh
+    symlink /dev/block/mmcblk0p9 /dev/block/kpanic
+
+on fs
+    # mount system partition to load touchpad
+    #exec /sbin/e2fsck -y /dev/block/system
+    #mount ext4 /dev/block/system /system noatime nodiratime wait ro barrier=1
+
+on post-fs
+    #exec /sbin/cp -a /system/etc/touchpad /etc
+    #exec /system/bin/touchpad -a
+
+on boot
+
+    ifup lo
+    hostname localhost
+    domainname localdomain
+
+    setprop ro.product.device olympus
+
+    exec /sbin/umount /system
+    write /sys/class/leds/button-backlight/brightness 64
+
+    # custom repeat delay (epsy kernel)
+    write /proc/tegra-kbc/repeat_cycle 6000
+    write /proc/tegra-kbc/repeat_delay 4096
+    write /proc/tegra-kbc/repoll_time 32
+
+    # in recovery, dmesg could report hung tasks (cpufreq-dvfsd)
+    write /proc/sys/kernel/hung_task_timeout_secs 0
+
+    class_start default
+
+service ueventd /sbin/ueventd
+    critical
+
+service recovery /sbin/recovery
+    oneshot
+
+service adbd /sbin/adbd recovery
+    disabled
+
+on property:persist.service.adb.enable=1
+    start adbd
+
+on property:persist.service.adb.enable=0
+    stop adbd
+
+# triggered by holding down volume down, volume up and power
+service reboot_key /sbin/reboot
+    disabled
+    keycodes 114 115 107
+    oneshot
+

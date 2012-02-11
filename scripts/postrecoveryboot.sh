@@ -1,6 +1,5 @@
 #!/sbin/sh
 
-# enable ADB
 echo msc_adb > /dev/usb_device_mode
 
 # upload firmware to touch screen
