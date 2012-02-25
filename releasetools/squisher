@@ -7,6 +7,10 @@
 echo "ATRIX SQUISHER"
 echo "================"
 
+DEVICE_OUT=$ANDROID_BUILD_TOP/out/target/product/olympus
+DEVICE_TOP=$ANDROID_BUILD_TOP/device/motorola/olympus
+VENDOR_TOP=$ANDROID_BUILD_TOP/vendor/motorola/olympus
+
 OUT_TARGET_HOST=`uname -a | grep Darwin`
 if [ -z "$OUT_TARGET_HOST" ]
 then
@@ -133,9 +137,8 @@ $SED -i \
 	$REPACK/ota/system/build.prop
 
 # Include device specific script
-if [ -f $ANDROID_BUILD_TOP/device/motorola/olympus/releasetools/squisher.sh ]; then
-	echo "squisher.sh..."
-	. $ANDROID_BUILD_TOP/device/motorola/olympus/releasetools/squisher.sh
+if [ -f $DEVICE_TOP/releasetools/squisher.sh ]; then
+	. $DEVICE_TOP/releasetools/squisher.sh
 fi
 
 # Delete unnecessary binaries
@@ -143,12 +146,12 @@ if [ -n "$DELETE_BINS" ]; then
 
 	echo "Removing unwanted binaries..."
 	cd $REPACK/ota/system/bin && echo $DELETE_BINS | xargs /bin/rm -f
-fi
 
-cd $REPACK/ota/system/bin && find -name "*_test" -exec /bin/rm -f {} \;
-cd $REPACK/ota/system/bin && find -name "*_Test" -exec /bin/rm -f {} \;
-cd $REPACK/ota/system/bin && find -name "test_*" -exec /bin/rm -f {} \;
-cd $REPACK/ota/system/bin && find -name "*Test*" -exec /bin/rm -f {} \;
+	cd $REPACK/ota/system/bin && find -name "*_test" -exec /bin/rm -f {} \;
+	cd $REPACK/ota/system/bin && find -name "*_Test" -exec /bin/rm -f {} \;
+	cd $REPACK/ota/system/bin && find -name "test_*" -exec /bin/rm -f {} \;
+	cd $REPACK/ota/system/bin && find -name "*Test*" -exec /bin/rm -f {} \;
+fi
 cd $REPACK
 
 # Strip modules
@@ -156,22 +159,15 @@ cd $REPACK
 	find $REPACK/ota/system/lib/modules -name "*.ko" -not -name "overclock*" -print0 | xargs -0 arm-eabi-strip --strip-unneeded
 
 # Determine what to name the new signed package
-if [ -z "$CYANOGEN_NIGHTLY" ]; then
+MODVERSION=`sed -n -e'/ro\.cm\.version/s/^.*CyanogenMod-//p' $REPACK/ota/system/build.prop`
+: ${MODVERSION:=nightly}
+OUTFILE=$OUT/update-cm-$MODVERSION-signed.zip
+
+if [ -z "$CYANOGEN_RELEASE" ]; then
+	REALDATE=`sed -n -r 's/ro.build.version.incremental=//p' $REPACK/ota/system/build.prop`
 	MODVERSION=`sed -n -e'/ro\.modversion/s/^.*CyanogenMod-//p' $REPACK/ota/system/build.prop`
-	: ${MODVERSION:=nightly}
-	OUTFILE=$OUT/update-cm-$MODVERSION-signed.zip
-else
-	OUTFILE=$OUT/update-squished.zip
-	if [ "$TARGET_PRODUCT" = "cyanogen_olympus" ]; then
-		REALDATE=`sed -n -r 's/ro.build.version.incremental=//p' $REPACK/ota/system/build.prop`
-		MODVERSION=`sed -n -e'/ro\.modversion/s/^.*CyanogenMod-//p' $REPACK/ota/system/build.prop`
-		#MODVERSION=`echo $MODVERSION | sed -r 's/[0-9]{8}/'$REALDATE'/'`
-		OUTFILE=$OUT/cm$MODVERSION.zip
-		if [ -n "$CYANOGEN_NIGHTLY_BOOT" ]; then
-			MODVERSION=`echo $MODVERSION | sed -r 's/NIGHTLY/BOOT'$CYANOGEN_NIGHTLY_BOOT'/'`
-			OUTFILE=$OUT/cm$MODVERSION.zip
-		fi
-	fi
+	#MODVERSION=`echo $MODVERSION | sed -r 's/[0-9]{8}/'$REALDATE'/'`
+	OUTFILE=$OUT/cm$MODVERSION.zip
 fi
 
 # Pack it up and sign
@@ -190,7 +186,6 @@ rm -rf $REPACK
 echo
 
 # Create a md5 checksum image of the repacked package
-(
 img=`basename $OUTFILE`
 cd `dirname $OUTFILE`
 $MD5 $img >$img.md5sum
@@ -199,9 +194,9 @@ echo "Package complete: $OUTFILE"
 cat $img.md5sum
 echo
 # Build date and current time:
+echo -n "build.prop: "
 cat $OUT/system/build.prop | grep ro.build.date=
 ls -l $OUTFILE
 echo
-)
 
 exit 0

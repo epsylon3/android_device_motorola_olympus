@@ -5,35 +5,35 @@ DEVICE_OUT=$ANDROID_BUILD_TOP/out/target/product/olympus
 DEVICE_TOP=$ANDROID_BUILD_TOP/device/motorola/olympus
 VENDOR_TOP=$ANDROID_BUILD_TOP/vendor/motorola/olympus
 
+echo "squisher.sh..."
+
 # Delete unwanted apps
-rm -f $REPACK/ota/system/app/RomManager.apk
-rm -f $REPACK/ota/system/xbin/irssi
+rm -f $REPACK/ota/system/app/FOTAKill.apk   #HTC stuff
+rm -f $REPACK/ota/system/app/RomManager.apk #On market
+rm -f $REPACK/ota/system/xbin/irssi         #Big (glibc) and not self compiled, not safe
 
 # these scripts are not required
-rm $REPACK/ota/system/etc/init.d/03firstboot
-rm $REPACK/ota/system/etc/init.d/04modules
+rm -f $REPACK/ota/system/etc/init.d/03firstboot
+rm -f $REPACK/ota/system/etc/init.d/04modules
 
 # remove dummy kernel module (created by kernel repo)
-rm $REPACK/ota/system/lib/modules/dummy.ko
+rm -f $REPACK/ota/system/lib/modules/dummy.ko
 
 # add an empty script to prevent logcat errors (moto init.rc)
 #touch $REPACK/ota/system/bin/mount_ext3.sh
 #chmod +x $REPACK/ota/system/bin/mount_ext3.sh
 
-mkdir -p $REPACK/ota/system/etc/terminfo/x
-cp $REPACK/ota/system/etc/terminfo/l/linux $REPACK/ota/system/etc/terminfo/x/xterm
+# xterm definition for putty default settings
+if [ ! -f $REPACK/ota/system/etc/terminfo/x/xterm ]; then
+    mkdir -p $REPACK/ota/system/etc/terminfo/x
+    cp $REPACK/ota/system/etc/terminfo/l/linux $REPACK/ota/system/etc/terminfo/x/xterm
+fi
 
-# prebuilt boot, devtree, logo & updater-script
+# prebuilt kernel & updater-script
 cp -f $DEVICE_TOP/releasetools/updater-script $REPACK/ota/META-INF/com/google/android/updater-script
-#if [ -n "$CYANOGEN_RELEASE" ]; then
-  cat $DEVICE_TOP/releasetools/updater-kernel >> $REPACK/ota/META-INF/com/google/android/updater-script
-  cp $DEVICE_TOP/releasetools/custom_backup_full.txt $REPACK/ota/system/etc/custom_backup_list.txt
-  cp $DEVICE_OUT/boot.img $REPACK/ota/
-  cp $DEVICE_OUT/recovery.img $REPACK/ota/
-#else
-#  cp $DEVICE_TOP/releasetools/custom_backup_list.txt $REPACK/ota/system/etc/custom_backup_list.txt
-#  rm -f $REPACK/ota/boot.img
-#fi
+cat $DEVICE_TOP/releasetools/updater-kernel >> $REPACK/ota/META-INF/com/google/android/updater-script
+cp $DEVICE_TOP/releasetools/custom_backup_kernel.txt $REPACK/ota/system/etc/custom_backup_list.txt
+cp $DEVICE_OUT/boot.img $REPACK/ota/
 
 # bootmenu tools
 cp -R -f -p $DEVICE_TOP/bootmenu/* $REPACK/ota/system/bootmenu/
