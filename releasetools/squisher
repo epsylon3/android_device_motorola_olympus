@@ -159,15 +159,13 @@ cd $REPACK
 	find $REPACK/ota/system/lib/modules -name "*.ko" -not -name "overclock*" -print0 | xargs -0 arm-eabi-strip --strip-unneeded
 
 # Determine what to name the new signed package
-MODVERSION=`sed -n -e'/ro\.cm\.version/s/^.*CyanogenMod-//p' $REPACK/ota/system/build.prop`
+MODVERSION=`sed -n -e'/ro\.modversion/s/^.*CyanogenMod-//p' $REPACK/ota/system/build.prop`
 : ${MODVERSION:=nightly}
 OUTFILE=$OUT/update-cm-$MODVERSION-signed.zip
 
 if [ -z "$CYANOGEN_RELEASE" ]; then
-	REALDATE=`sed -n -r 's/ro.build.version.incremental=//p' $REPACK/ota/system/build.prop`
-	MODVERSION=`sed -n -e'/ro\.modversion/s/^.*CyanogenMod-//p' $REPACK/ota/system/build.prop`
-	#MODVERSION=`echo $MODVERSION | sed -r 's/[0-9]{8}/'$REALDATE'/'`
-	OUTFILE=$OUT/cm$MODVERSION.zip
+	# reduce nightly filename size
+	OUTFILE=$OUT/CM$MODVERSION.zip
 fi
 
 # Pack it up and sign
