@@ -127,6 +127,8 @@ BOARD_HAVE_BLUETOOTH_BCM := true
 #Camera
 TARGET_USE_MOTO_CUSTOM_CAMERA_PARAMETERS := true
 TARGET_SPECIFIC_HEADER_PATH := device/motorola/olympus/include
+BOARD_USE_GINGERBREAD_BINDER := true
+BOARD_OVERLAY_BASED_CAMERA_HAL := true
 
 #EGL
 BOARD_EGL_CFG := device/motorola/olympus/config/egl.cfg

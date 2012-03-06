@@ -405,14 +405,14 @@ void CameraHAL_FixupParams(CameraParameters &settings)
 
     /* defy: focus locks the camera, but dunno how to disable it... */
     if (!settings.get(android::CameraParameters::KEY_SUPPORTED_FOCUS_MODES))
-        settings.set(android::CameraParameters::KEY_SUPPORTED_FOCUS_MODES, "auto,macro,infinity,off");
+        settings.set(android::CameraParameters::KEY_SUPPORTED_FOCUS_MODES, "auto,infinity,macro,fixed");
 
     if (!settings.get(android::CameraParameters::KEY_SUPPORTED_EFFECTS))
-        settings.set(android::CameraParameters::KEY_SUPPORTED_EFFECTS, "none,mono,negative,sepia");
+        settings.set(android::CameraParameters::KEY_SUPPORTED_EFFECTS, "mono,negative,none,posterize,sepia,solarize");
 
     if (!settings.get(android::CameraParameters::KEY_SUPPORTED_SCENE_MODES))
-        settings.set(android::CameraParameters::KEY_SUPPORTED_EFFECTS,
-                     "auto,portrait,landscape,action,night-portrait,sunset,steadyphoto");
+        settings.set(android::CameraParameters::KEY_SUPPORTED_SCENE_MODES,
+            "auto,action,portrait,landscape,beach,candlelight,fireworks,night,night-portrait,party,snow,sports,steadyphoto,sunset,theatre,barcode");
 
     settings.set(android::CameraParameters::KEY_EXPOSURE_COMPENSATION, "0");
 
