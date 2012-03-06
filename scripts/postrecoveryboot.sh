@@ -2,9 +2,6 @@
 
 echo msc_adb > /dev/usb_device_mode
 
-# upload firmware to touch screen
-sleep 3 #wait for /dev/block/mmcblk0p12 to appear
-
 # stop warning about dvfs on dmesg
 echo 0 > /proc/sys/kernel/hung_task_timeout_secs
 

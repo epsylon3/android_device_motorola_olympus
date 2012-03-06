@@ -52,6 +52,7 @@ on boot
     domainname localdomain
 
     setprop ro.product.device olympus
+    setprop service.adb.root 1
 
     exec /sbin/umount /system
     write /sys/class/leds/button-backlight/brightness 64
@@ -76,10 +77,15 @@ service adbd /sbin/adbd recovery
     disabled
 
 on property:persist.service.adb.enable=1
+    setprop service.adb.root 1
     start adbd
 
 on property:persist.service.adb.enable=0
     stop adbd
+
+on property:ro.debuggable=1
+    setprop service.adb.root 1
+    start adbd
 
 # triggered by holding down volume down, volume up and power
 service reboot_key /sbin/reboot
