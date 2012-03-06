@@ -82,7 +82,6 @@ rm -rf $REPACK
 mkdir -p $REPACK
 echo
 
-
 # Unpack the otapackage and opticharge all apks
 mkdir $REPACK/ota
 (
@@ -91,6 +90,13 @@ printf "Unpacking $OTAPACKAGE..."
 unzip $QUIET $OTAPACKAGE
 echo
 cd $REPACK/ota/system/framework
+)
+
+# Include device specific script
+if [ -f $DEVICE_TOP/releasetools/squisher.sh ]; then
+       . $DEVICE_TOP/releasetools/squisher.sh
+fi
+
 if [ "$1" != "fast" ]; then
 	$OPTICHARGER framework-res.apk
 	cd $REPACK/ota/system/app
@@ -98,7 +104,6 @@ if [ "$1" != "fast" ]; then
 else
 	echo "skipping apk optimization"
 fi
-)
 
 
 if [ "$WANT_SQUASHFS" -eq 1 ]; then
@@ -136,11 +141,6 @@ $SED -i \
 	-e '/ro\.build\.type/s/eng/user/' \
 	$REPACK/ota/system/build.prop
 
-# Include device specific script
-if [ -f $DEVICE_TOP/releasetools/squisher.sh ]; then
-	. $DEVICE_TOP/releasetools/squisher.sh
-fi
-
 # Delete unnecessary binaries
 if [ -n "$DELETE_BINS" ]; then
 
@@ -159,17 +159,13 @@ cd $REPACK
 	find $REPACK/ota/system/lib/modules -name "*.ko" -not -name "overclock*" -print0 | xargs -0 arm-eabi-strip --strip-unneeded
 
 # Determine what to name the new signed package
-if [ -z "$CM_NIGHTLY" ]; then
+MODVERSION=`sed -n -e'/ro\.modversion/s/^.*=//p' $REPACK/ota/system/build.prop`
+: ${MODVERSION:=nightly}
+OUTFILE=$OUT/update-cm-$MODVERSION-signed.zip
+
+if [ -n "$CM_NIGHTLY" ]; then
 	MODVERSION=`sed -n -e'/ro\.modversion/s/^.*=//p' $REPACK/ota/system/build.prop`
-	: ${MODVERSION:=nightly}
-	OUTFILE=$OUT/update-cm-$MODVERSION-signed.zip
-else
-	OUTFILE=$OUT/update-squished.zip
-	if [ "$TARGET_PRODUCT" = "cm_olympus" ]; then
-		REALDATE=`sed -n -r 's/ro.build.version.incremental=//p' $REPACK/ota/system/build.prop`
-		MODVERSION=`sed -n -e'/ro\.modversion/s/^.*=//p' $REPACK/ota/system/build.prop`
-		OUTFILE=$OUT/cm$MODVERSION.zip
-	fi
+	OUTFILE=$OUT/CM$MODVERSION.zip
 fi
 
 # Pack it up and sign
