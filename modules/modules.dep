@@ -1,7 +1,7 @@
 rpcsec_gss_krb5.ko: auth_rpcgss.ko sunrpc.ko
 auth_rpcgss.ko: sunrpc.ko
 sunrpc.ko:
-nfs.ko: lockd.ko auth_rpcgss.ko sunrpc.ko
+nfs.ko: lockd.ko sunrpc.ko
 lockd.ko: sunrpc.ko
 evfwd.ko:
 dhd.ko:

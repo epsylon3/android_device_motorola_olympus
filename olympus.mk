@@ -76,6 +76,11 @@ PRODUCT_PACKAGES += Usb \
 
 DEVICE_PACKAGE_OVERLAYS += device/motorola/olympus/overlay
 
+# Kernel and modules
+PRODUCT_PACKAGES += kernel_and_modules
+PRODUCT_COPY_FILES += \
+    device/motorola/olympus/modules/modules.dep:system/lib/modules/modules.dep \
+
 # Board-specific init
 PRODUCT_COPY_FILES += \
     device/motorola/olympus/config/vold.fstab:system/etc/vold.fstab \
