@@ -10,21 +10,53 @@ echo "addons.sh: $1"
 # remove dummy kernel module (created by kernel repo)
 rm -f $REPACK/ota/system/lib/modules/dummy.ko
 
-cat $DEVICE_TOP/releasetools/updater-addons-full > $REPACK/ota/META-INF/com/google/android/updater-script
-cp $DEVICE_OUT/boot.img $REPACK/ota/
-cp $DEVICE_OUT/recovery.img $REPACK/ota/
-OUTFILE=$OUT/kernel_and_recovery.zip
+if [ -z "$1" ]; then
+	echo "addons.sh: error ! no target specified"
+	exit 1;
+fi
 
 if [ "$1" = "recovery" ]; then
 	cat $DEVICE_TOP/releasetools/updater-addons-recovery > $REPACK/ota/META-INF/com/google/android/updater-script
 	rm -rf $REPACK/ota/system
-	rm $REPACK/ota/boot.img
+	cp $DEVICE_OUT/recovery.img $REPACK/ota/
 	OUTFILE=$OUT/recovery.zip
 fi
 
 if [ "$1" = "kernel" ]; then
-        cat $DEVICE_TOP/releasetools/updater-addons-kernel > $REPACK/ota/META-INF/com/google/android/updater-script
-        rm $REPACK/ota/recovery.img
-        OUTFILE=$OUT/kernel.zip
+	cat $DEVICE_TOP/releasetools/updater-addons-kernel > $REPACK/ota/META-INF/com/google/android/updater-script
+	cp $DEVICE_OUT/boot.img $REPACK/ota/
+	OUTFILE=$OUT/kernel.zip
+fi
+
+if [ "$1" = "bootmenu" ]; then
+
+	cd $REPACK/ota
+	unzip -q $OTAPACKAGE "system/bootmenu/*" "system/bin/*"
+
+	cat $DEVICE_TOP/releasetools/updater-addons-bootmenu > $REPACK/ota/META-INF/com/google/android/updater-script
+
+	#atrix bootmenu require a custom kernel to allow the framebuffer
+	cp $DEVICE_OUT/boot.img $REPACK/ota/
+	cat $DEVICE_TOP/releasetools/updater-addons-kernel >> $REPACK/ota/META-INF/com/google/android/updater-script
+
+	mv $REPACK/ota/system/bin/logwrapper $REPACK/ota/system/bootmenu/binary/
+	rm -r -f $REPACK/ota/system/bin
+	mkdir -p $REPACK/ota/system/bin
+	cp $DEVICE_OUT/system/bin/bootmenu $REPACK/ota/system/bin/
+	# cp $DEVICE_OUT/system/bin/toolbox $REPACK/ota/system/bin/
+
+	mkdir -p $REPACK/ota/system/bootmenu/2nd-init
+	cp $DEVICE_OUT/root/init.rc $REPACK/ota/system/bootmenu/2nd-init/
+	cp $DEVICE_OUT/root/init.olympus.rc $REPACK/ota/system/bootmenu/2nd-init/
+	cp $DEVICE_OUT/root/ueventd.rc $REPACK/ota/system/bootmenu/2nd-init/
+	cp $DEVICE_OUT/root/ueventd.olympus.rc $REPACK/ota/system/bootmenu/2nd-init/
+	cp $DEVICE_OUT/root/init $REPACK/ota/system/bootmenu/2nd-init/
+
+	mkdir -p $REPACK/ota/system/bootmenu/2nd-boot
+	cp $REPACK/ota/system/bootmenu/binary/2nd-init $REPACK/ota/system/bootmenu/binary/2nd-boot
+	cp $DEVICE_OUT/root/init $REPACK/ota/system/bootmenu/2nd-boot/
+	cp $DEVICE_OUT/root/*.rc $REPACK/ota/system/bootmenu/2nd-boot/
+
+	OUTFILE=$OUT/bootmenu.zip
 fi
 

@@ -52,6 +52,7 @@ mkdir -p $REPACK/ota
 
 printf "Unpacking $OTAPACKAGE..."
 cd $REPACK/ota
+#only keep kernel modules and signatures
 unzip -q $OTAPACKAGE "system/lib/modules/*" "META-INF/*"
 
 # Default package name for the new signed package
