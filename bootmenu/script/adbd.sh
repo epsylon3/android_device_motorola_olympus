@@ -16,8 +16,10 @@ sync
 echo eth > /dev/usb_device_mode
 
 stop adbd
-sleep 1
 busybox ifconfig lo up
+
+setprop service.adb.root 1
+sleep 1
 
 echo charge_adb > /dev/usb_device_mode
 echo usb_mode_charge_adb > /tmp/usbd_current_state

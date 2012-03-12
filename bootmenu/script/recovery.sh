@@ -28,7 +28,6 @@ chmod 755 /res
 
 cp -r -f $BM_ROOTDIR/recovery/res/* /res/
 cp -p -f $BM_ROOTDIR/recovery/sbin/* /sbin/
-cp -p -f $BM_ROOTDIR/script/recoveryexit.sh /sbin/
 
 if [ ! -f /sbin/recovery ]; then
     ln -s /sbin/recovery_stable /sbin/recovery

@@ -19,8 +19,6 @@ PRODUCT_COPY_FILES += \
     external/bootmenu/images/progress_empty.png:system/bootmenu/images/progress_empty.png \
     external/bootmenu/images/progress_fill.png:system/bootmenu/images/progress_fill.png \
     ${bm_device}/bootmenu/images/background.png:system/bootmenu/images/background.png \
-    ${bm_device}/bootmenu/images/background.png:recovery/res/images/icon_clockwork.png \
-    ${bm_device}/bootmenu/images/background.png:system/bootmenu/recovery/res/images/icon_clockwork.png
 
 # bootmenu config
 PRODUCT_COPY_FILES += \

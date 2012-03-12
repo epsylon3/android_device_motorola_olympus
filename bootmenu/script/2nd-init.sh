@@ -5,11 +5,10 @@
 source /system/bootmenu/script/_config.sh
 
 ######## Main Script
-
+toolbox mount -o remount,rw rootfs /
 busybox mount -o remount,rw /
 rm -f /*.rc
 rm -f /*.sh
-rm -f /osh
 rm -f /preinstall
 cp -f /system/bootmenu/2nd-init/* /
 rm /sbin/ueventd && ln -s /init /sbin/ueventd
