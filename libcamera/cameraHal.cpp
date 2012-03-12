@@ -48,8 +48,7 @@ using namespace std;
 
 #include "CameraHardwareInterface.h"
 
-#define YUV_CAM_FORMAT CameraParameters::PIXEL_FORMAT_YUV422I
-
+#define YUV_CAM_FORMAT CameraParameters::PIXEL_FORMAT_YUV420SP
 #define DISPLAY_RGB565
 
 #ifdef DISPLAY_RGB565
@@ -356,6 +355,7 @@ void CameraHAL_ProcessPreviewData(char *frame, size_t size, legacy_camera_device
                     case OVERLAY_FORMAT_YUV422I:
                         Yuv422iToRgba8888((char*)vaddr, frame, lcdev->previewWidth, lcdev->previewHeight);
                         break;
+                    case OVERLAY_FORMAT_YUV420P:
                     case OVERLAY_FORMAT_YUV420SP:
                         Yuv420spToRgba8888((char*)vaddr, frame, lcdev->previewWidth, lcdev->previewHeight);
                         break;
@@ -363,6 +363,7 @@ void CameraHAL_ProcessPreviewData(char *frame, size_t size, legacy_camera_device
                     case OVERLAY_FORMAT_YUV422I:
                         Yuv422iToRgb565((char*)vaddr, frame, lcdev->previewWidth, lcdev->previewHeight, stride);
                         break;
+                    case OVERLAY_FORMAT_YUV420P:
                     case OVERLAY_FORMAT_YUV420SP:
                         Yuv420spToRgb565((char*)vaddr, frame, lcdev->previewWidth, lcdev->previewHeight, stride);
                         break;
@@ -518,13 +519,13 @@ void CameraHAL_FixupParams(struct camera_device * device, CameraParameters &sett
     settings.setPreviewFormat(YUV_CAM_FORMAT);
 
     if (!settings.get("preview-size-values"))
-        settings.set("preview-size-values", "176x144,320x240,352x288,480x360,640x480,848x480");
+        settings.set("preview-size-values", "160x120,176x144,320x240,352x288,480x480,640x480,720x480,720x576,800x448");
 
     if (!settings.get("picture-size-values"))
-        settings.set("picture-size-values", "320x240,640x480,1280x960,1600x1200,2048x1536,2592x1456,2592x1936");
+        settings.set("picture-size-values", "480x480,640x480,800x600,1024x768,1280x960,1600x1200,2048x1536,2592x1458,2592x1944");
 
     if (!settings.get("mot-video-size-values"))
-        settings.set("mot-video-size-values", "176x144,320x240,352x288,640x480,848x480");
+        settings.set("mot-video-size-values", "160x120,176x144,320x240,352x288,640x480,720x480,720x576,1280x720,1920x1080");
 
     //LibSOCJordanCamera( 2113): Failed substring capabilities check, unsupported parameter newparam=on parseTable[i].key=focus-mode,currparam=auto
     const char *str_focus = settings.get(android::CameraParameters::KEY_FOCUS_MODE);
@@ -581,10 +582,10 @@ void CameraHAL_FixupParams(struct camera_device * device, CameraParameters &sett
         height = atoi(sh + 1);
         ratio = (height * 1.0) / width;
         if (ratio < 0.70 && width >= 640) {
-            settings.setPreviewSize(848, 480);
-            settings.set(CameraParameters::KEY_PREFERRED_PREVIEW_SIZE_FOR_VIDEO, "848x480");
+            settings.setPreviewSize(800, 448);
+            settings.set(CameraParameters::KEY_PREFERRED_PREVIEW_SIZE_FOR_VIDEO, "800x448");
             need_reset = true;
-        } else if (width == 848) {
+        } else if (width == 800) {
             settings.setPreviewSize(640, 480);
             settings.set(CameraParameters::KEY_PREFERRED_PREVIEW_SIZE_FOR_VIDEO, "640x480");
             need_reset = true;
