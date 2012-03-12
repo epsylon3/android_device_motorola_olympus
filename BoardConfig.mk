@@ -155,7 +155,7 @@ TARGET_CUSTOM_RELEASETOOL := ./device/motorola/olympus/releasetools/squisher
 
 # Bootmenu & recovery
 TARGET_RECOVERY_PIXEL_FORMAT := "RGB_565"
-#BOARD_USES_BOOTMENU := true
+BOARD_USES_BOOTMENU := true
 BOARD_BOOTMODE_CONFIG_FILE := /cache/recovery/bootmode.conf
 BOARD_NEVER_UMOUNT_SYSTEM := true
 TARGET_NEEDS_MOTOROLA_HIJACK := true

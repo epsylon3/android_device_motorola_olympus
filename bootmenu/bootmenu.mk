@@ -28,6 +28,24 @@ PRODUCT_COPY_FILES += \
     ${bm_device}/bootmenu/config/overclock.conf:system/bootmenu/config/overclock.conf \
     ${bm_device}/bootmenu/script/_config.sh:system/bootmenu/script/_config.sh \
 
+# scripts
+PRODUCT_COPY_FILES += \
+    ${bm_device}/bootmenu/script/2nd-init.sh:system/bootmenu/script/2nd-init.sh \
+    ${bm_device}/bootmenu/script/2nd-boot.sh:system/bootmenu/script/2nd-boot.sh \
+    ${bm_device}/bootmenu/script/stock.sh:system/bootmenu/script/stock.sh \
+    ${bm_device}/bootmenu/script/adbd.sh:system/bootmenu/script/adbd.sh \
+    ${bm_device}/bootmenu/script/bootmode_clean.sh:system/bootmenu/script/bootmode_clean.sh \
+    ${bm_device}/bootmenu/script/cdrom.sh:system/bootmenu/script/cdrom.sh \
+    ${bm_device}/bootmenu/script/data.sh:system/bootmenu/script/data.sh \
+    ${bm_device}/bootmenu/script/overclock.sh:system/bootmenu/script/overclock.sh \
+    ${bm_device}/bootmenu/script/post_bootmenu.sh:system/bootmenu/script/post_bootmenu.sh \
+    ${bm_device}/bootmenu/script/pre_bootmenu.sh:system/bootmenu/script/pre_bootmenu.sh \
+    ${bm_device}/bootmenu/script/recovery.sh:system/bootmenu/script/recovery.sh \
+    ${bm_device}/bootmenu/script/recovery_stable.sh:system/bootmenu/script/recovery_stable.sh \
+    ${bm_device}/bootmenu/script/sdcard.sh:system/bootmenu/script/sdcard.sh \
+    ${bm_device}/bootmenu/script/system.sh:system/bootmenu/script/system.sh \
+    ${bm_device}/bootmenu/script/reboot_command.sh:system/bootmenu/script/reboot_command.sh \
+
 # static tools
 PRODUCT_COPY_FILES += \
     out/target/product/olympus/root/sbin/adbd:system/bootmenu/binary/adbd \
@@ -60,7 +78,8 @@ PRODUCT_COPY_FILES += \
     ${bm_device}/bootmenu/recovery/res/images/indeterminate6.png:system/bootmenu/recovery/res/images/indeterminate6.png \
     ${bm_device}/bootmenu/recovery/res/images/progress_empty.png:system/bootmenu/recovery/res/images/progress_empty.png \
     ${bm_device}/bootmenu/recovery/res/images/progress_fill.png:system/bootmenu/recovery/res/images/progress_fill.png \
-    ${bm_device}/bootmenu/recovery/res/images/icon_clockwork.png:system/bootmenu/recovery/res/images/icon_clockwork.png \
+    ${bm_device}/bootmenu/recovery/res/images/icon_cm.png:system/bootmenu/recovery/res/images/icon_clockwork.png \
+    ${bm_device}/bootmenu/recovery/res/images/icon_cm.png:system/bootmenu/recovery/res/images/icon_bootmenu.png \
     ${bm_device}/bootmenu/recovery/sbin/e2fsck:system/bootmenu/recovery/sbin/e2fsck \
     ${bm_device}/bootmenu/recovery/sbin/fix_permissions:system/bootmenu/recovery/sbin/fix_permissions \
     ${bm_device}/bootmenu/recovery/sbin/killrecovery.sh:system/bootmenu/recovery/sbin/killrecovery.sh \
@@ -75,4 +94,7 @@ PRODUCT_COPY_FILES += \
     ${bm_device}/bootmenu/recovery/sbin/mke2fs.bin:system/bootmenu/recovery/sbin/mke2fs.bin \
     ${bm_device}/bootmenu/recovery/recovery.fstab:system/bootmenu/recovery/recovery.fstab \
     ${bm_device}/bootmenu/images/background.png:system/bootmenu/recovery/res/images/icon_bootmenu.png \
+
+# other recovery packages
+PRODUCT_PACKAGES += e2fsck
 
