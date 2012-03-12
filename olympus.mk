@@ -37,6 +37,10 @@ PRODUCT_COPY_FILES += \
     device/motorola/olympus/scripts/bt_init_wrapper.sh:system/bin/bt_init_wrapper.sh \
     device/motorola/olympus/scripts/usb_switch.sh:system/bin/usb_switch.sh
 
+# override bootanimation, i dont want samsung stuff
+PRODUCT_COPY_FILES += \
+    device/motorola/olympus/bootanimation.zip:system/media/bootanimation.zip
+
 # sysctl conf
 PRODUCT_COPY_FILES += \
     device/motorola/olympus/config/sysctl.conf:system/etc/sysctl.conf
