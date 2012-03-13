@@ -3,6 +3,7 @@ import init.olympus.usb.rc
 on init
     export EXTERNAL_STORAGE /mnt/sdcard
     export PHONE_STORAGE /mnt/emmc
+
     # create mountpoints for storage
     mkdir /mnt/sdcard 0000 system system
     mkdir /mnt/emmc 0000 system system
@@ -502,13 +503,10 @@ on early-boot
         setprop ro.EMPTY_APP_MEM 21000
 
 on boot
-	chown system /dev/aes1750
-	chgrp system /dev/aes1750
+	chown system system /dev/aes1750
 	chmod 0600 /dev/aes1750
-	chown system /data/am2data.db
-	chown system /data/am2data.db.meta
-	chgrp system /data/am2data.db
-	chgrp system /data/am2data.db.meta
+	chown system system /data/am2data.db
+	chown system system /data/am2data.db.meta
 
 # Enable ADB
    write /dev/usb_device_mode charge_adb
