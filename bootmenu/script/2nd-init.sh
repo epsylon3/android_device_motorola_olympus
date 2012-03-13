@@ -39,7 +39,6 @@ fi
 
 ## unmount devices
 sync
-umount /acct
 umount /dev/cpuctl
 umount /dev/pts
 umount /mnt/asec
@@ -52,11 +51,13 @@ umount /data
 rm -f /sbin/lsof
 
 ## busybox cleanup..
-for cmd in $(/sbin/busybox --list); do
-    [ -L "/sbin/$cmd" ] && rm "/sbin/$cmd"
-done
+if [ -f /sbin/busybox ]; then
+    for cmd in $(/sbin/busybox --list); do
+        [ -L "/sbin/$cmd" ] && rm "/sbin/$cmd"
+    done
 
-rm -f /sbin/busybox
+    rm -f /sbin/busybox
+fi
 
 ## used for adbd shell (can be bash also)
 /system/xbin/ln -s /system/xbin/busybox /sbin/sh
