@@ -37,10 +37,6 @@ PRODUCT_COPY_FILES += \
     device/motorola/olympus/scripts/bt_init_wrapper.sh:system/bin/bt_init_wrapper.sh \
     device/motorola/olympus/scripts/usb_switch.sh:system/bin/usb_switch.sh
 
-# override bootanimation, i dont want samsung stuff
-PRODUCT_COPY_FILES += \
-    device/motorola/olympus/bootanimation.zip:system/media/bootanimation.zip
-
 # sysctl conf
 PRODUCT_COPY_FILES += \
     device/motorola/olympus/config/sysctl.conf:system/etc/sysctl.conf
@@ -138,4 +134,8 @@ PRODUCT_PACKAGES += RomUpdater
 PRODUCT_PACKAGES += Trebuchet FileManager Torch CMStats
 
 $(call inherit-product-if-exists, device/motorola/olympus/bootmenu/bootmenu.mk)
+
+# override bootanimation, no samsung stuff
+PRODUCT_COPY_FILES += \
+    device/motorola/olympus/bootanimation.zip:system/media/bootanimation.zip
 
