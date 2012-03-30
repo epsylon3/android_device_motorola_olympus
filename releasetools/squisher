@@ -161,10 +161,11 @@ cd $REPACK
 # Determine what to name the new signed package
 MODVERSION=`sed -n -e'/ro\.modversion/s/^.*=//p' $REPACK/ota/system/build.prop`
 : ${MODVERSION:=nightly}
+
+MODVERSION=`echo $MODVERSION | sed 's/CyanogenMod-//'`
 OUTFILE=$OUT/update-cm-$MODVERSION-signed.zip
 
 if [ -n "$CM_NIGHTLY" ]; then
-	MODVERSION=`sed -n -e'/ro\.modversion/s/^.*=//p' $REPACK/ota/system/build.prop`
 	OUTFILE=$OUT/CM$MODVERSION.zip
 fi
 
@@ -189,7 +190,7 @@ img=`basename $OUTFILE`
 cd `dirname $OUTFILE`
 $MD5 $img >$img.md5sum
 echo
-echo "Package complete: $OUTFILE"
+echo -e ${CL_INS}"Package complete: $OUTFILE"${CL_RST}
 cat $img.md5sum
 echo
 # Build date and current time:
@@ -198,6 +199,7 @@ ls -l $OUTFILE
 echo
 )
 
+cd $ANDROID_BUILD_TOP
 if [ -x $DEVICE_TOP/releasetools/addons ]; then
 	$DEVICE_TOP/releasetools/addons recovery
 fi

@@ -4,7 +4,7 @@
 # Atrix-Dev-Team
 #
 
-echo "ATRIX ADDONS PACKAGER:$1"
+echo "ATRIX ADDONS PACKAGER: $1"
 echo "---------------------"
 
 DEVICE_OUT=$ANDROID_BUILD_TOP/out/target/product/olympus
@@ -86,10 +86,8 @@ java -Xmx768m \
 rm -rf $REPACK
 echo
 
-cd `dirname $OUTFILE`
-echo "Addon package complete: $OUTFILE"
+echo -e ${CL_INS}"Addon package complete: $OUTFILE"${CL_RST}
 echo
 ls -l $OUTFILE
-echo
 
 exit 0

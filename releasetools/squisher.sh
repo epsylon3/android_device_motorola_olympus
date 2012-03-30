@@ -34,7 +34,7 @@ cp -f $DEVICE_TOP/releasetools/updater-script $REPACK/ota/META-INF/com/google/an
 #fi
 
 # bootmenu tools
-cp -R -f -p $DEVICE_TOP/bootmenu/* $REPACK/ota/system/bootmenu/
+# cp -R -f -p $DEVICE_TOP/bootmenu/* $REPACK/ota/system/bootmenu/
 
 mkdir -p $REPACK/ota/system/bootmenu/2nd-init
 cp $DEVICE_OUT/root/init.rc $REPACK/ota/system/bootmenu/2nd-init/
@@ -45,6 +45,7 @@ cp $DEVICE_OUT/root/ueventd.olympus.rc $REPACK/ota/system/bootmenu/2nd-init/
 mkdir -p $REPACK/ota/system/bootmenu/2nd-boot
 cp $REPACK/ota/system/bootmenu/binary/2nd-init $REPACK/ota/system/bootmenu/binary/2nd-boot
 cp $DEVICE_OUT/root/init $REPACK/ota/system/bootmenu/2nd-boot/
+cp $DEVICE_OUT/root/*.rc $REPACK/ota/system/bootmenu/2nd-boot/
 
 cp $DEVICE_OUT/recovery/root/sbin/recovery $REPACK/ota/system/bootmenu/recovery/
 
