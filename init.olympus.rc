@@ -93,6 +93,9 @@ on init
     write /proc/tegra-kbc/repoll_time 32
 
 on fs
+    # mount the debug fs
+    mount debugfs debugfs /sys/kernel/debug
+
     # mount mtd partitions
     mount ext4 /dev/block/mmcblk0p12 /system noatime nodiratime wait ro barrier=1
     mount ext4 /dev/block/mmcblk0p15 /cache nosuid nodev noatime nodiratime wait barrier=1 noauto_da_alloc
