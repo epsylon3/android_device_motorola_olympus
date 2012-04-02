@@ -72,7 +72,8 @@ PRODUCT_PACKAGES += Usb \
 			OlympusParts \
 			Torch \
 			hcitool \
-			hciconfig
+			hciconfig \
+			screencap
 
 # Add DroidSSHd (dropbear) Management App - tpruvot/android_external_droidsshd @ github
 PRODUCT_PACKAGES += DroidSSHd dropbear dropbearkey sftp-server scp ssh
