@@ -3,6 +3,8 @@ bm_device = device/motorola/olympus
 
 PRODUCT_PACKAGES += \
     bootmenu \
+    e2fsck \
+    tune2fs \
     utility_lsof \
     static_busybox \
     static_logwrapper \
@@ -76,5 +78,5 @@ PRODUCT_COPY_FILES += \
     ${bm_device}/bootmenu/recovery/recovery.fstab:system/bootmenu/recovery/recovery.fstab \
     ${bm_device}/bootmenu/images/background.png:system/bootmenu/recovery/res/images/icon_bootmenu.png \
     out/target/product/olympus/utilities/tune2fs:system/bootmenu/recovery/sbin/tune2fs \
-    out/target/product/olympus/utilities/e2fsck:system/bootmenu/recovery/sbin/e2fsck \
+    out/target/product/olympus/recovery/root/sbin/e2fsck:system/bootmenu/recovery/sbin/e2fsck \
 
