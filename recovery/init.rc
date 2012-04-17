@@ -30,15 +30,19 @@ on init
     symlink /emmc /mnt/emmc
 
     # partitions helpers
-    symlink /dev/block/mmcblk0p12 /dev/block/system
-    symlink /dev/block/mmcblk0p15 /dev/block/cache
-    symlink /dev/block/mmcblk0p16 /dev/block/data
-    symlink /dev/block/mmcblk0p13 /dev/block/osh
-    symlink /dev/block/mmcblk0p9 /dev/block/kpanic
+    symlink mmcblk0p12 /dev/block/system
+    symlink mmcblk0p15 /dev/block/cache
+    symlink mmcblk0p16 /dev/block/userdata
+    symlink mmcblk0p13 /dev/block/osh
+    symlink mmcblk0p9 /dev/block/kpanic
 
 on fs
+    # mount the debug fs /d
+    mount debugfs debugfs /sys/kernel/debug
+
     # mount system partition to load touchpad
-    #exec /sbin/e2fsck -y /dev/block/system
+    exec /sbin/e2fsck -y /dev/block/system
+
     #mount ext4 /dev/block/system /system noatime nodiratime wait ro barrier=1
 
 on post-fs
