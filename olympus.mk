@@ -22,12 +22,7 @@
 # The gps config appropriate for this device
 $(call inherit-product, device/common/gps/gps_us_supl.mk)
 
-## (1) First, the most specific values, i.e. the aspects that are specific to GSM
-PRODUCT_COPY_FILES += \
-    device/motorola/olympus/init.olympus.rc:root/init.olympus.rc \
-    device/motorola/olympus/ueventd.olympus.rc:root/ueventd.olympus.rc
-
-## (2) Also get non-open-source GSM-specific aspects if available
+## get non-open-source GSM-specific aspects if available
 $(call inherit-product-if-exists, vendor/motorola/olympus/olympus-vendor.mk)
 
 # motorola helper scripts
@@ -123,7 +118,12 @@ PRODUCT_COPY_FILES += \
     frameworks/base/data/etc/android.hardware.wifi.xml:system/etc/permissions/android.hardware.wifi.xml \
     frameworks/base/data/etc/handheld_core_hardware.xml:system/etc/permissions/handheld_core_hardware.xml
 
-PRODUCT_BUILD_PROP_OVERRIDES += BUILD_UTC_DATE=0
+# Stock kernel
+PRODUCT_COPY_FILES += \
+    device/motorola/olympus/init.rc:root/init.rc \
+    device/motorola/olympus/ueventd.rc:root/ueventd.rc \
+    device/motorola/olympus/init_prep_keypad.sh:root/init_prep_keypad.sh \
+    device/motorola/olympus/init:root/init
 
 PRODUCT_NAME := generic_olympus
 PRODUCT_DEVICE := olympus

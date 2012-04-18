@@ -14,34 +14,30 @@ BB="/sbin/busybox"
 ## reduce lcd backlight to save battery
 echo 64 > /sys/class/leds/lcd-backlight/brightness
 
-
-# these first commands are duplicated for broken systems
-mount -o remount,rw rootfs /
 $BB_STATIC mount -o remount,rw /
 
-# we will use the static busybox
-cp -f $BB_STATIC $BB
+# copy static busybox in ramfs
 $BB_STATIC cp -f $BB_STATIC $BB
 
-chmod 755 /sbin
-chmod 755 $BB
+chmod 775 /sbin
+chmod 775 $BB
 $BB chown 0.0 $BB
 $BB chmod 4755 $BB
 
-if [ -f /sbin/chmod ]; then
+if [ -L /sbin/bbconfig ]; then
     # job already done...
     exit 0
 fi
 
-# busybox sym link..
-for cmd in $($BB --list); do
-    $BB ln -s /sbin/busybox /sbin/$cmd
+# busybox symlink..
+for cmd in $($BB_STATIC --list); do
+    $BB ln -s busybox /sbin/$cmd
 done
 
 # add lsof to debug locks
 cp -f /system/bootmenu/binary/lsof /sbin/lsof
 
-$BB chmod +rx /sbin/*
+$BB_STATIC chmod +rx /sbin/*
 
 # custom adbd (allow always root)
 cp -f /system/bootmenu/binary/adbd /sbin/adbd.root
@@ -73,6 +69,9 @@ fi
 
 # Atrix need that to enable the keypad
 /system/bin/touchpad -a
+
+# tegra : disable second core to save power in bootmenu/recovery
+echo 0 > /sys/devices/system/cpu/cpu1/online
 
 # load ondemand safe settings to reduce heat and battery use
 #if [ -x /system/bootmenu/script/overclock.sh ]; then

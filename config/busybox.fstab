@@ -4,9 +4,9 @@
 # <file system>         <mount point>     <type>    <options>                      <dump> <pass>
 
 rootfs                  /                 rootfs    ro,relatime                         0      0
-/dev/block/mmcblk0p12   /system           ext4      ro,noatime,errors=continue          0      0
-/dev/block/mmcblk0p16   /data             ext4      rw,nosuid,noatime,errors=continue   0      0
-/dev/block/mmcblk0p15   /cache            ext4      rw,noatime,errors=continue          0      0
+/dev/block/mmcblk0p12   /system           ext3      ro,noatime,errors=continue          0      0
+/dev/block/mmcblk0p16   /data             ext3      rw,nosuid,noatime,errors=continue   0      0
+/dev/block/mmcblk0p15   /cache            ext3      rw,noatime,errors=continue          0      0
 
 /dev/block/mmcblk0p13   /osh              ext3      rw,noatime,errors=continue          0      0
 /dev/block/mmcblk0p17   /preinstall       ext3      rw,noatime,errors=continue          0      0

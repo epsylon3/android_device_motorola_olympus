@@ -1,4 +1,3 @@
-
 on early-init
     start ueventd
 
@@ -48,7 +47,7 @@ loglevel 3
 
     mkdir /system
     mkdir /data 0771 system system
-    mkdir /cache 0770 system cache
+    mkdir /cache 0775 system cache
     mkdir /config 0500 root root
     mkdir /pds 0755 root root
     mkdir /misc 0770 system misc
@@ -110,6 +109,8 @@ on fs
     mount ext3 /dev/block/mmcblk0p15 /cache nosuid nodev noatime nodiratime wait barrier=1
     mount ext3 /dev/block/mmcblk0p12 /system noatime nodiratime wait ro barrier=1
 
+    mkdir /cache/bootmenu
+    chmod 0755 /cache/bootmenu
     exec /system/bin/logwrapper /system/bin/bootmenu
 
     mount ext3 /dev/block/mmcblk0p16 /data nosuid nodev noatime nodiratime wait barrier=1
@@ -215,6 +216,9 @@ on post-fs
     chmod 0770 /data/lost+found
     chown root root /cache/lost+found
     chmod 0770 /cache/lost+found
+
+    # Dont delete this line, used as event in bootmenu (cpu settings & postbootmenu)
+    exec /system/bin/bootmenu postbootmenu
 
 on boot
 # basic network init
@@ -711,18 +715,18 @@ on boot
     chmod 660 /dev/akm8975_aot
 # atvc stuff
 # Define Motorola DBVC ATVC Property defaults (failsafe properties)
-       setprop ro.sys.atvc_allow_netmon_usb 0
-       setprop ro.sys.atvc_allow_netmon_ih 0
-       setprop ro.sys.atvc_allow_res_core 0
-       setprop ro.sys.atvc_allow_res_panic 0
-       setprop ro.sys.atvc_allow_all_adb 0
-       setprop ro.sys.atvc_allow_all_core 0
-       setprop ro.sys.atvc_allow_efem 0
-       setprop ro.sys.atvc_allow_bp_log 0
-       setprop ro.sys.atvc_allow_ap_mot_log 0
-       setprop ro.sys.atvc_allow_gki_log 0
-       mkdir /data/atvc 0775 system shell
-       chown system shell /data/atvc
+    setprop ro.sys.atvc_allow_netmon_usb 0
+    setprop ro.sys.atvc_allow_netmon_ih 0
+    setprop ro.sys.atvc_allow_res_core 0
+    setprop ro.sys.atvc_allow_res_panic 0
+    setprop ro.sys.atvc_allow_all_adb 0
+    setprop ro.sys.atvc_allow_all_core 0
+    setprop ro.sys.atvc_allow_efem 0
+    setprop ro.sys.atvc_allow_bp_log 0
+    setprop ro.sys.atvc_allow_ap_mot_log 0
+    setprop ro.sys.atvc_allow_gki_log 0
+    mkdir /data/atvc 0775 system shell
+    chown system shell /data/atvc
 
 # touchpad stuff
     chmod 660 /sys/class/misc/touchpad
@@ -979,10 +983,10 @@ service map /system/bin/sdptool add --channel=20 MAP
 # ro.sys.atvc_allow_netmon_ih
 # ro.sys.atvc_allow_all_adb
 service atvc /system/bin/dbvc_atvc_property_set
-       class pre-zygote_services
-       user system
-       group system
-       oneshot
+    class pre-zygote_services
+    user system
+    group system
+    oneshot
 
 service dlnasrv /system/bin/dlnasrv
     class post-zygote_services
@@ -999,21 +1003,21 @@ on property:sys.mot.encrypt.test=1
 # after init.nv_common.rc. 
 
 on early-boot
-        setprop ro.FOREGROUND_APP_MEM 3072
-        setprop ro.VISIBLE_APP_MEM 4608
-        setprop ro.PERCEPTIBLE_APP_MEM 7200
-        setprop ro.HEAVY_WEIGHT_APP_MEM 7200
-        setprop ro.SECONDARY_SERVER_MEM 11776
-        setprop ro.BACKUP_APP_MEM 11776
-        setprop ro.HOME_APP_MEM 11776
-        setprop ro.HIDDEN_APP_MEM 17408
-        setprop ro.EMPTY_APP_MEM 21000
+    setprop ro.FOREGROUND_APP_MEM 3072
+    setprop ro.VISIBLE_APP_MEM 4608
+    setprop ro.PERCEPTIBLE_APP_MEM 7200
+    setprop ro.HEAVY_WEIGHT_APP_MEM 7200
+    setprop ro.SECONDARY_SERVER_MEM 11776
+    setprop ro.BACKUP_APP_MEM 11776
+    setprop ro.HOME_APP_MEM 11776
+    setprop ro.HIDDEN_APP_MEM 17408
+    setprop ro.EMPTY_APP_MEM 21000
 
 on boot
-	chown system system /dev/aes1750
-	chmod 0600 /dev/aes1750
-	chown system system /data/am2data.db
-	chown system system /data/am2data.db.meta
+    chown system system /dev/aes1750
+    chmod 0600 /dev/aes1750
+    chown system system /data/am2data.db
+    chown system system /data/am2data.db.meta
 
 # Adjust Android LMK
     write /sys/module/lowmemorykiller/parameters/minfree 3072,4608,7200,11776,17408,21000
@@ -1047,24 +1051,23 @@ on boot
 # This will be overriding one defined in init.rc
 # IKOLYMP-12325- TCP Window Size values, for ATT-CAT10.
 # IKOLYMP-12429- Optimize TCP stack for HSUPA CAT6 throughput
-      setprop net.tcp.buffersize.default 131072,262144,524288,4096,16384,147456
-      setprop net.tcp.buffersize.wifi    131072,262144,524288,4096,16384,147456
-      setprop net.tcp.buffersize.umts    131072,262144,524288,4096,16384,147456
-      setprop net.tcp.buffersize.edge    16384,32768,65536,4096,16384,32768
-      setprop net.tcp.buffersize.gprs    4096,8192,12288,4096,8192,12288
-
+    setprop net.tcp.buffersize.default 131072,262144,524288,4096,16384,147456
+    setprop net.tcp.buffersize.wifi    131072,262144,524288,4096,16384,147456
+    setprop net.tcp.buffersize.umts    131072,262144,524288,4096,16384,147456
+    setprop net.tcp.buffersize.edge    16384,32768,65536,4096,16384,32768
+    setprop net.tcp.buffersize.gprs    4096,8192,12288,4096,8192,12288
 
 #OSH Startup
 service slrestart /usr/local/bin/start_syslog.sh
-	class pre-zygote_services
-	oneshot
-	disabled
+    class pre-zygote_services
+    oneshot
+    disabled
 
 on property:ro.build.type=userdebug
-	start slrestart
+    start slrestart
 
 on property:ro.build.type=eng
-	start slrestart
+    start slrestart
 
 service fbcp /etc/init.d/start_fbcp.sh
     class pre-zygote_services
@@ -1099,8 +1102,8 @@ service logging /system/bin/sh /data/logging.sh
 
 # Fingerprint sensor daemon
 service am2server /system/bin/am2server
-	user system
-	group system inet input
+    user system
+    group system inet input
     class pre-zygote_services
 
 service loadpreinstalls /system/bin/logwrapper /system/bin/load_pia.sh

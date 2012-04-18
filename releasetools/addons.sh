@@ -41,7 +41,7 @@ if [ "$1" = "bootmenu" ]; then
 	cat $DEVICE_TOP/releasetools/updater-addons-kernel >> $REPACK/ota/META-INF/com/google/android/updater-script
 
 	mv $REPACK/ota/system/bin/bootmenu $REPACK/ota/system/bootmenu/binary/bootmenu
-	cp $DEVICE_OUT/utilities/busybox $REPACK/ota/system/bootmenu/binary/
+	cp $DEVICE_TOP/bootmenu/binary/busybox $REPACK/ota/system/bootmenu/binary/
 	rm -r -f $REPACK/ota/system/bin
 	mkdir -p $REPACK/ota/system/bin
 	mv $REPACK/ota/system/bootmenu/binary/bootmenu $REPACK/ota/system/bin/bootmenu
@@ -50,12 +50,15 @@ if [ "$1" = "bootmenu" ]; then
 	mkdir -p $REPACK/ota/system/bootmenu/2nd-init
 	cp $DEVICE_OUT/root/init $REPACK/ota/system/bootmenu/2nd-init/
 	cp $DEVICE_OUT/root/*.rc $REPACK/ota/system/bootmenu/2nd-init/
+	rm -f $REPACK/ota/system/bootmenu/2nd-init/*.goldfish.rc
+
 	cp $DEVICE_TOP/init $REPACK/ota/system/bootmenu/2nd-init/
 
 	mkdir -p $REPACK/ota/system/bootmenu/2nd-boot
 	cp $REPACK/ota/system/bootmenu/binary/2nd-init $REPACK/ota/system/bootmenu/binary/2nd-boot
 	cp $DEVICE_OUT/root/init $REPACK/ota/system/bootmenu/2nd-boot/
 	cp $DEVICE_OUT/root/*.rc $REPACK/ota/system/bootmenu/2nd-boot/
+	rm -f $REPACK/ota/system/bootmenu/2nd-init/*.goldfish.rc
 
 	OUTFILE=$OUT/bootmenu_stock.zip
 fi

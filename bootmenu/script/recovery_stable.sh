@@ -15,14 +15,15 @@ mkdir -p /res
 rm -f /etc
 mkdir -p /etc
 
-# hijack mke2fs
-rm -f /sbin/mke2fs
-
 # prefer full binary
 [ -L /sbin/e2fsck ] && rm /sbin/e2fsck
 
 rm -f /sdcard
 mkdir /sdcard
+mkdir /emmc
+
+# to allow "eat"
+ln -s /sdcard /mnt/sdcard
 
 chmod 755 /sbin
 chmod 755 /res
@@ -31,9 +32,8 @@ cp -r -f $BM_ROOTDIR/recovery/res/* /res/
 cp -p -f $BM_ROOTDIR/recovery/sbin/* /sbin/
 cp -p -f $BM_ROOTDIR/script/recoveryexit.sh /sbin/
 
-if [ ! -f /sbin/recovery_stable ]; then
-    ln -s /sbin/recovery /sbin/recovery_stable
-fi
+# recovery prebuilt
+cp -f /sbin/recovery_stable /sbin/recovery
 
 cd /sbin
 ln -s recovery edify
@@ -113,7 +113,7 @@ echo 0 > /sys/class/leds/blue/brightness
 
 echo 35 > /sys/class/leds/button-backlight/brightness
 
-/sbin/recovery_stable
+/sbin/recovery
 
 # Post Recovery (back to bootmenu)
 

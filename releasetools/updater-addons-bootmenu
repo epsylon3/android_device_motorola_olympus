@@ -5,13 +5,15 @@ ui_print("Installing bootmenu");
 show_progress(0.100000, 0);
 mount("ext3", "EMMC", "/dev/block/mmcblk0p12", "/system");
 
-show_progress(0.300000, 0);
+show_progress(0.200000, 0);
 
 # make space on moto rom
 delete("/system/app/Maps.apk");
 delete("/system/app/Maps.odex");
-delete("/system/app/Gmail.odex");
 delete("/system/app/Gmail.apk");
+delete("/system/app/Gmail.odex");
+delete("/system/app/YouTube.apk");
+delete("/system/app/YouTube.odex");
 
 package_extract_dir("system", "/system");
 
@@ -23,6 +25,12 @@ set_perm_recursive(0, 2000, 0755, 0750, "/system/bootmenu/2nd-boot/sbin/");
 set_perm(0, 2000, 0750, "/system/bootmenu/2nd-init/init");
 set_perm(0, 2000, 0750, "/system/bootmenu/2nd-boot/init");
 set_perm_recursive(0, 2000, 0775, 0664, "/system/bootmenu/config/");
+
+delete("/system/lib/dhd.ko");
+symlink("modules/dhd.ko","/system/lib/dhd.ko");
+
+symlink("../modules/aev.ko","/system/lib/hw/aev.ko");
+symlink("../modules/evfwd.ko","/system/lib/hw/evfwd.ko");
 
 show_progress(0.100000, 0);
 

@@ -1,4 +1,4 @@
-#!/system/bin/sh
+#!/system/bootmenu/binary ash
 
 ######## BootMenu Script
 ######## Execute Post BootMenu
@@ -14,12 +14,20 @@ export PATH=/system/xbin:/system/bin:/sbin
 
 echo 0 > /sys/class/leds/blue/brightness
 
-## Run Init Script
+BB=/system/bootmenu/binary/busybox
 
 ######## Don't Delete.... ########################
-mount -o remount,rw rootfs /
+$BB mount -o remount,rw rootfs /
 mount -o remount,rw $PART_SYSTEM /system
 ##################################################
+
+if [ ! -e /sbin/adbd ]; then
+    $BB cp -f /system/bootmenu/binary/adbd /sbin/adbd
+fi
+
+if [ ! -e /sbin/sh ]; then
+    $BB ln -s $BB /sbin/sh
+fi
 
 if [ -d $BM_ROOTDIR/init.d ]; then
     chmod 755 $BM_ROOTDIR/init.d/*

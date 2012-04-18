@@ -6,12 +6,12 @@ export PATH=/sbin:/system/xbin:/system/bin
 PART_SYSTEM=/dev/block/mmcblk0p12
 PART_CACHE=/dev/block/mmcblk0p15
 PART_DATA=/dev/block/mmcblk0p16
-#PART_PDS=/dev/block/mmcblk0p3
+PART_PDS=/dev/block/mmcblk0p3
 
-FS_SYSTEM=ext4
-FS_CACHE=ext4
-FS_DATA=ext4
-FS_OSH=ext4
+FS_SYSTEM=ext3
+FS_CACHE=ext3
+FS_DATA=ext3
+FS_OSH=ext3
 
 FS_PDS=ext3
 

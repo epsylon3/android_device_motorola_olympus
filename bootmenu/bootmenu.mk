@@ -32,11 +32,30 @@ PRODUCT_COPY_FILES += \
     ${bm_device}/bootmenu/config/overclock.conf:system/bootmenu/config/overclock.conf \
     ${bm_device}/bootmenu/script/_config.sh:system/bootmenu/script/_config.sh \
 
+# scripts
+PRODUCT_COPY_FILES += \
+    ${bm_device}/bootmenu/script/2nd-init.sh:system/bootmenu/script/2nd-init.sh \
+    ${bm_device}/bootmenu/script/2nd-boot.sh:system/bootmenu/script/2nd-boot.sh \
+    ${bm_device}/bootmenu/script/stock.sh:system/bootmenu/script/stock.sh \
+    ${bm_device}/bootmenu/script/adbd.sh:system/bootmenu/script/adbd.sh \
+    ${bm_device}/bootmenu/script/bootmode_clean.sh:system/bootmenu/script/bootmode_clean.sh \
+    ${bm_device}/bootmenu/script/cdrom.sh:system/bootmenu/script/cdrom.sh \
+    ${bm_device}/bootmenu/script/data.sh:system/bootmenu/script/data.sh \
+    ${bm_device}/bootmenu/script/overclock.sh:system/bootmenu/script/overclock.sh \
+    ${bm_device}/bootmenu/script/post_bootmenu.sh:system/bootmenu/script/post_bootmenu.sh \
+    ${bm_device}/bootmenu/script/pre_bootmenu.sh:system/bootmenu/script/pre_bootmenu.sh \
+    ${bm_device}/bootmenu/script/recovery.sh:system/bootmenu/script/recovery.sh \
+    ${bm_device}/bootmenu/script/recovery_stable.sh:system/bootmenu/script/recovery_stable.sh \
+    ${bm_device}/bootmenu/script/sdcard.sh:system/bootmenu/script/sdcard.sh \
+    ${bm_device}/bootmenu/script/system.sh:system/bootmenu/script/system.sh \
+    ${bm_device}/bootmenu/script/reboot_command.sh:system/bootmenu/script/reboot_command.sh \
+
 # static tools
 PRODUCT_COPY_FILES += \
     out/target/product/olympus/root/sbin/adbd:system/bootmenu/binary/adbd \
-    out/target/product/olympus/utilities/busybox:system/bootmenu/binary/busybox \
-    out/target/product/olympus/utilities/lsof:system/bootmenu/binary/lsof \
+    ${bm_device}/bootmenu/binary/busybox:system/bootmenu/binary/busybox \
+
+#   out/target/product/olympus/utilities/busybox:system/bootmenu/binary/busybox \
 
 # recovery tools
 PRODUCT_COPY_FILES += \
@@ -79,4 +98,9 @@ PRODUCT_COPY_FILES += \
     ${bm_device}/bootmenu/images/background.png:system/bootmenu/recovery/res/images/icon_bootmenu.png \
     out/target/product/olympus/utilities/tune2fs:system/bootmenu/recovery/sbin/tune2fs \
     out/target/product/olympus/recovery/root/sbin/e2fsck:system/bootmenu/recovery/sbin/e2fsck \
+
+# Stock kernel
+PRODUCT_COPY_FILES += \
+    ${bm_device}/init.rc:system/bootmenu/2nd-init/init.rc \
+    ${bm_device}/ueventd.rc:system/bootmenu/2nd-init/ueventd.rc \
 
