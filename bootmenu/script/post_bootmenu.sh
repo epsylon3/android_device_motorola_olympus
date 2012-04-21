@@ -26,13 +26,17 @@ if [ ! -e /sbin/adbd ]; then
 fi
 
 if [ ! -e /sbin/sh ]; then
-    $BB ln -s $BB /sbin/sh
+    $BB cp -f $BB /sbin/
+    $BB ln -s busybox /sbin/sh
 fi
 
 if [ -d $BM_ROOTDIR/init.d ]; then
     chmod 755 $BM_ROOTDIR/init.d/*
     run-parts $BM_ROOTDIR/init.d/
 fi
+
+## restore second core
+echo 1 > /sys/devices/system/cpu/cpu1/online
 
 # normal cleanup here (need fix in recovery first)
 # ...

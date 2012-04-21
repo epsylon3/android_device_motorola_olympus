@@ -31,6 +31,7 @@ PRODUCT_COPY_FILES += \
     ${bm_device}/bootmenu/config/default_bootmode.conf:system/bootmenu/config/default_bootmode.conf \
     ${bm_device}/bootmenu/config/overclock.conf:system/bootmenu/config/overclock.conf \
     ${bm_device}/bootmenu/script/_config.sh:system/bootmenu/script/_config.sh \
+    ${bm_device}/config/busybox.fstab:system/bootmenu/config/busybox.fstab \
 
 # scripts
 PRODUCT_COPY_FILES += \

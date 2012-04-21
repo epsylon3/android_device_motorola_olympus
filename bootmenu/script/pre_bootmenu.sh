@@ -15,6 +15,7 @@ BB="/sbin/busybox"
 echo 64 > /sys/class/leds/lcd-backlight/brightness
 
 $BB_STATIC mount -o remount,rw /
+$BB_STATIC mount -o remount,rw /system
 
 # copy static busybox in ramfs
 $BB_STATIC cp -f $BB_STATIC $BB
@@ -51,6 +52,11 @@ chmod 666 /dev/graphics/fb0
 
 ## /default.prop replace.. (TODO: check if that works)
 cp -f /system/bootmenu/config/default.prop /default.prop
+
+## fstab for busybox mount
+if [ ! -e /system/etc/fstab ]; then
+    cp -f /system/bootmenu/config/busybox.fstab /system/etc/fstab
+fi
 
 ## mount cache for boot mode and recovery logs
 mkdir -p /cache
