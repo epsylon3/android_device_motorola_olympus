@@ -4,9 +4,7 @@ rmnet2_drv.ko:
 rmnet1_drv.ko:
 rmnet0_drv.ko:
 dhd.ko:
-cpufreq_ondemand.ko:
-cpufreq_conservative.ko:
 ansi_cprng.ko:
 evfwd.ko:
 aev.ko:
-
+vpnclient.ko:
