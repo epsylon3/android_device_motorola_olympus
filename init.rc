@@ -960,6 +960,13 @@ service pppd /system/bin/pppd silent ipparam dun plugin /system/lib/libpppd_plug
     disabled
     oneshot
 
+# ppp daemon used by DUN.
+#service pppd /system/xbin/pppd silent ipparam dun plugin /system/lib/libpppd_plugin.so
+#    class post-zygote_services
+#    user root
+#    disabled
+#    oneshot
+
 service map /system/bin/sdptool add --channel=20 MAP
     class post-zygote_services
     user bluetooth
@@ -1084,13 +1091,6 @@ on property:ro.webtop.boot=1
 
 on property:sys.SystemMode=RM_SM_DOCKED
     exec /osh/etc/init.d/startX.sh
-
-# ppp daemon used by DUN.
-service pppd /system/xbin/pppd silent ipparam dun plugin /system/lib/libpppd_plugin.so
-    class post-zygote_services
-    user root
-    disabled
-    oneshot
 
 # FIX ME before ship
 # This is utility that we can throw logging script on demand.
