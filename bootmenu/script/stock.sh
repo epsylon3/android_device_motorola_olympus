@@ -1,28 +1,29 @@
-#!/sbin/sh
+#!/system/bootmenu/binary/busybox ash
 
 ######## BootMenu Script
-######## Execute [Normal] Boot
+######## Execute [Direct] Boot
 
+source /system/bootmenu/script/_config.sh
 
-export PATH=/sbin:/system/xbin:/system/bin
+export PATH=/system/xbin:/system/bin:$PATH
 
 ######## Main Script
 
-mount -o remount,rw /
-cp -f /system/bootmenu/binary/adbd /sbin/adbd
-chmod 4755 /sbin/adbd
-chown root.system /sbin/adbd
+BB=/system/bootmenu/binary/busybox
+
+$BB mount -o remount,rw /
 
 ######## Cleanup
 
-rm -f /sbin/lsof
-
-## busybox applets cleanup..
-for cmd in $(/sbin/busybox --list); do
-  [ -L "/sbin/$cmd" ] && [ "$cmd" != "sh" ] && rm "/sbin/$cmd"
+## busybox applets cleanup, keep missing ones in system
+for cmd in $($BB --list); do
+    [ -L "/sbin/$cmd" ] && $BB rm "/sbin/$cmd"
 done
 
-#rm /sbin/busybox
+## let /sbin for osh mount
+$BB mv /sbin /.sbin
+
+$BB mount -o remount,ro /
 
 ## reduce lcd backlight to save battery
 echo 18 > /sys/class/leds/lcd-backlight/brightness

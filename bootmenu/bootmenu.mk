@@ -3,6 +3,7 @@ bm_device = device/motorola/olympus
 
 PRODUCT_PACKAGES += \
     bootmenu \
+    reboot_bm \
     utility_lsof \
     static_busybox \
     static_logwrapper \
