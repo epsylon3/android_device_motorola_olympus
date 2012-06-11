@@ -18,5 +18,5 @@ ramfs                   /tmp              ramfs     rw,relatime,size=512k       
 
 /dev/block/mmcblk0p18   /mnt/emmc         vfat      rw,noatime,errors=continue          0      0
 /dev/block/mmcblk1p1    /mnt/sdcard       vfat      rw,noatime,errors=continue          0      0
-/dev/block/mmcblk1p2    /sd-ext           ext3      rw,noatime,errors=continue          0      0
+/dev/block/mmcblk1p2    /sd-ext           ext4      rw,noatime,errors=continue          0      0
 
