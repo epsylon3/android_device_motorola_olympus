@@ -76,7 +76,7 @@ PRODUCT_PACKAGES += Usb \
 			screencap
 
 # Add DroidSSHd (dropbear) Management App - tpruvot/android_external_droidsshd @ github
-PRODUCT_PACKAGES += DroidSSHd dropbear dropbearkey sftp-server scp ssh
+PRODUCT_PACKAGES += DroidSSHd dropbear dropbearkey sftp-server scp ssh rsync
 
 # Bootmenu on tegra system :)
 $(call inherit-product-if-exists, device/motorola/olympus/bootmenu/bootmenu.mk)

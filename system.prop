@@ -84,3 +84,10 @@ dalvik.vm.dexopt-flags=m=y,u=n
 ro.authentec.fingerprint.jar=/system/framework/am2app.jar
 ro.authentec.fingerprint.so=/system/lib/libam2app.so
 
+#
+# ADDITIONAL_DEFAULT_PROPERTIES
+#
+ro.secure=0
+ro.debuggable=1
+EXTERNAL_STORAGE_MOUNT=/mnt/sdcard
+

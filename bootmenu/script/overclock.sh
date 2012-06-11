@@ -1,5 +1,7 @@
 #!/system/bin/sh
 
+exit 0
+
 ######## BootMenu Script
 ######## Overclock.sh
 

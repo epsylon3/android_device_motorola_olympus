@@ -3,11 +3,11 @@ on init
     loglevel 8
 
     # partitions helpers
-    symlink /dev/block/mmcblk0p12 /dev/block/system
-    symlink /dev/block/mmcblk0p15 /dev/block/cache
-    symlink /dev/block/mmcblk0p16 /dev/block/data
-    symlink /dev/block/mmcblk0p13 /dev/block/osh
-    symlink /dev/block/mmcblk0p9 /dev/block/kpanic
+    symlink mmcblk0p12 /dev/block/system
+    symlink mmcblk0p15 /dev/block/cache
+    symlink mmcblk0p16 /dev/block/userdata
+    symlink mmcblk0p13 /dev/block/osh
+    symlink mmcblk0p9 /dev/block/kpanic
 
     export PHONE_STORAGE /mnt/emmc
     # create mountpoints for internal "SD"
@@ -118,25 +118,25 @@ on post-fs
     # Create dump dir and collect dumps.
     # Do this before we mount cache so eventually we can use cache for
     # storing dumps on platforms which do not have a dedicated dump partition.
-  
+
     # Collect apanic data to kpanic mmc
-    write /proc/apanic /dev/block/kpanic
- 
+    write /proc/apanic /dev/block/mmcblk0p9
+
     mkdir /data/dontpanic
     chown root log /data/dontpanic
-    chmod 0750 /data/dontpanic
+    chmod 0775 /data/dontpanic
 
     copy /proc/apanic_annotate /data/dontpanic/apanic_annotate
     chown root log /data/dontpanic/apanic_annotate
-    chmod 0640 /data/dontpanic/apanic_annotate
+    chmod 0664 /data/dontpanic/apanic_annotate
 
     copy /proc/apanic_console /data/dontpanic/apanic_console
     chown root log /data/dontpanic/apanic_console
-    chmod 0640 /data/dontpanic/apanic_console
+    chmod 0664 /data/dontpanic/apanic_console
 
     copy /proc/apanic_threads /data/dontpanic/apanic_threads
     chown root log /data/dontpanic/apanic_threads
-    chmod 0640 /data/dontpanic/apanic_threads
+    chmod 0664 /data/dontpanic/apanic_threads
 
     write /proc/apanic_console 1
 
@@ -193,13 +193,13 @@ on boot
     chmod 0664 /proc/bluetooth/sleep/proto
 
     # wlan permissions
-    mkdir /data/misc/wifi 0771 wifi wifi  
-    mkdir /data/misc/wifi/sockets 0771 system wifi 
-    chown system wifi /data/misc/wifi/sockets 
+    mkdir /data/misc/wifi 0771 wifi wifi
+    mkdir /data/misc/wifi/sockets 0771 system wifi
+    chown system wifi /data/misc/wifi/sockets
     chmod 0771 /data/misc/wifi
-    mkdir /data/misc/dhcp 0771 dhcp dhcp 
+    mkdir /data/misc/dhcp 0771 dhcp dhcp
     chown dhcp dhcp /data/misc/dhcp
-    mkdir /data/misc/dhcpcd 0771 dhcp dhcp 
+    mkdir /data/misc/dhcpcd 0771 dhcp dhcp
     chown dhcp dhcp /data/misc/dhcpcd
     setprop wifi.interface eth0
     setprop softap.interface wl0.1
