@@ -11,6 +11,11 @@ PRODUCT_PACKAGES += \
 
 include $(all-subdir-makefiles)
 
+# addon.d backups on upgrade
+PRODUCT_COPY_FILES += \
+    ${bm_device}/releasetools/addon.d/70-bootmenu.sh:system/addon.d/70-bootmenu.sh \
+    ${bm_device}/releasetools/addon.d/70-gapps.sh:system/addon.d/70-gapps.sh \
+
 # images
 PRODUCT_COPY_FILES += \
     external/bootmenu/images/indeterminate1.png:system/bootmenu/images/indeterminate1.png \

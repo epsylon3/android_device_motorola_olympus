@@ -1,9 +1,9 @@
 #!/bin/sh
 #
-# Squish a CM otapackage for distribution
-# cyanogen / CyanogenDefy / Atrix-Dev-Team
+# Squish a CM otapackage zip for distribution
 #
 
+echo
 echo "ATRIX SQUISHER"
 echo "================"
 
@@ -46,36 +46,6 @@ OPTICHARGER=$ANDROID_BUILD_TOP/vendor/cm/tools/opticharger
 QUIET=-q
 DELETE_BINS="applypatch applypatch_static check_prereq recovery updater"
 
-
-# Some products want a squashfs for xbin for space
-case "$TARGET_PRODUCT" in
-	cm_dream_sapphire) WANT_SQUASHFS=1 ;;
-	*) WANT_SQUASHFS=0 ;;
-esac
-
-if [ "$WANT_SQUASHFS" -eq 1 ]; then
-	fatal=0
-	MKSQUASHFS_VER_REQ=4
-	if type mksquashfs >/dev/null 2>&1; then
-		if mksquashfs -version | grep -q "version $MKSQUASHFS_VER_REQ"; then :; else
-			echo
-			echo "ERROR: mksquashfs must be at least version $MKSQUASHFS_VER_REQ for this build."
-			fatal=1
-		fi
-	else
-		echo
-		echo "ERROR: $TARGET_PRODUCT requires mksquashfs."
-		fatal=1
-	fi
-
-	if [ "$fatal" -ne 0 ]; then
-		echo
-		echo "       Unoptimized package is still available at"
-		echo "         $OTAPACKAGE"
-		exit $fatal
-	fi
-fi
-
 REPACK=$OUT/repack.d
 printf "Sanitizing environment..."
 rm -rf $REPACK
@@ -106,35 +76,6 @@ else
 fi
 
 
-if [ "$WANT_SQUASHFS" -eq 1 ]; then
-	squash_opts="-force-uid 1000 -force-gid 1000 -no-progress -noappend -no-exports -no-recovery"
-	updater=$REPACK/ota/META-INF/com/google/android/updater-script
-
-	# Relocate su
-	cp -a $REPACK/ota/system/xbin $REPACK/_xbin/
-	rm -f $REPACK/_xbin/su $REPACK/ota/system/bin/su
-	mv $REPACK/ota/system/xbin/su $REPACK/ota/system/bin/su
-	chmod -R 755 $REPACK/_xbin/*
-
-	# Create symlinks for su and busybox (since updater-script can't work on the squashfs filesystem).
-	# Forgive me for the regex hell here. 
-	ln -s ../bin/su $REPACK/_xbin/su
-	for link in `sed -n -e's/,//g' -e'/symlink(.*busybox/,/xbin.*);/p' $updater | tr '"' '\n' | sed -n -e'\,/system/xbin/,s,/system/xbin/,,p'`
-	do
-		ln -s busybox $REPACK/_xbin/$link
-	done
-
-	# Create the squashfs with new and improved symlinkage!
-	mksquashfs $REPACK/_xbin/* $REPACK/_xbin.sqf $squash_opts
-	rm -rf $REPACK/ota/system/xbin/*
-	mv $REPACK/_xbin.sqf $REPACK/ota/system/xbin/xbin.sqf
-	chmod 644 $REPACK/ota/system/xbin/xbin.sqf
-
-	# Remove xbin stuff and fix up updater-script
-	$SED -i -e's,system/xbin/su,system/bin/su,g' -e'/xbin/d' $updater
-fi
-
-
 # Fix build.prop
 $SED -i \
 	-e '/ro\.kernel\.android\.checkjni/d' \
@@ -160,48 +101,45 @@ cd $REPACK
 
 # Determine what to name the new signed package
 MODVERSION=`sed -n -e'/ro\.modversion/s/^.*=//p' $REPACK/ota/system/build.prop`
-: ${MODVERSION:=nightly}
-
 MODVERSION=`echo $MODVERSION | sed 's/CyanogenMod-//'`
-OUTFILE=$OUT/update-cm-$MODVERSION-signed.zip
+OUTFILE=$OUT/cm-$MODVERSION.zip
 
 if [ -n "$CM_NIGHTLY" ]; then
 	OUTFILE=$OUT/CM$MODVERSION.zip
 fi
 
 # Pack it up and sign
-printf "Zipping package..."
+echo Zipping package...
 ( cd $REPACK/ota; zip $QUIET -r $REPACK/update.zip . )
-echo
-printf "Signing package..."
+
+echo Signing package...
 SECURITYDIR=$ANDROID_BUILD_TOP/build/target/product/security
 java -Xmx768m \
 	-jar $ANDROID_BUILD_TOP/out/host/$OUT_TARGET_HOST/framework/signapk.jar \
 	-w $SECURITYDIR/testkey.x509.pem $SECURITYDIR/testkey.pk8 \
 	$REPACK/update.zip $OUTFILE
-echo
-printf "Cleaning up..."
+
+echo Cleaning up...
 rm -rf $REPACK
-echo
 
 # Create a md5 checksum image of the repacked package
-(
 img=`basename $OUTFILE`
 cd `dirname $OUTFILE`
 $MD5 $img >$img.md5sum
+
 echo
-echo -e ${CL_INS}"Package complete: $OUTFILE"${CL_RST}
-cat $img.md5sum
-echo
+echo ${CL_INS}"Package complete:"${CL_RST}
 # Build date and current time:
 cat $OUT/system/build.prop | grep ro.build.date=
+cat $img.md5sum
+echo
 ls -l $OUTFILE
 echo
-)
 
 cd $ANDROID_BUILD_TOP
 if [ -x $DEVICE_TOP/releasetools/addons ]; then
 	$DEVICE_TOP/releasetools/addons recovery
+	$DEVICE_TOP/releasetools/addons bootmenu
 fi
 
 exit 0

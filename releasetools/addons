@@ -86,7 +86,7 @@ java -Xmx768m \
 rm -rf $REPACK
 echo
 
-echo -e ${CL_INS}"Addon package complete: $OUTFILE"${CL_RST}
+echo ${CL_INS}"Addon package complete: $OUTFILE"${CL_RST}
 echo
 ls -l $OUTFILE
 

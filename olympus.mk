@@ -78,9 +78,12 @@ PRODUCT_PACKAGES += Usb \
 DEVICE_PACKAGE_OVERLAYS += device/motorola/olympus/overlay
 
 # Kernel and modules
-PRODUCT_PACKAGES += kernel_and_modules
 PRODUCT_COPY_FILES += \
     device/motorola/olympus/modules/modules.dep:system/lib/modules/modules.dep \
+
+# addon.d module backups on upgrade without kernel
+#PRODUCT_COPY_FILES += \
+#    ${bm_device}/releasetools/addon.d/60-modules.sh:system/addon.d/60-modules.sh \
 
 # Board-specific init
 PRODUCT_COPY_FILES += \
