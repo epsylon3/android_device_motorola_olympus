@@ -1,11 +1,15 @@
 import init.olympus.usb.rc
 
+on early-init
+    loglevel 9
+
 on init
     export EXTERNAL_STORAGE /mnt/sdcard
     export PHONE_STORAGE /mnt/emmc
 
-    export HISTFILE /cache/bootmenu/.ash_history
+    export HISTFILE /tmp/.ash_history
     export HISTFILESIZE 1000
+    export ENV /system/etc/profile
 
     # create mountpoints for storage
     mkdir /mnt/sdcard 0000 system system
@@ -23,16 +27,32 @@ on init
     mkdir /pds 0755 root root
     mkdir /osh 0000 root root
 
+    # touchpad stuff
+    chmod 660 /sys/class/misc/touchpad
+    chown compass compass /sys/bus/i2c/drivers/qtouch-obp-ts/0-004a/irqStatus
+
 on fs
+    # partitions helpers
+    symlink mmcblk0p12 /dev/block/system
+    symlink mmcblk0p15 /dev/block/cache
+    symlink mmcblk0p16 /dev/block/userdata
+    symlink mmcblk0p13 /dev/block/osh
+    symlink mmcblk0p9 /dev/block/kpanic
+
+    # mount the debug fs
+    mount debugfs debugfs /sys/kernel/debug
+
     # mount main partitions
     mount ext4 /dev/block/mmcblk0p12 /system noatime nodiratime wait ro barrier=1
     mount ext4 /dev/block/mmcblk0p15 /cache nosuid nodev noatime nodiratime wait barrier=1 noauto_da_alloc
+    mount ext4 /dev/block/mmcblk0p13 /osh nodev noatime nodiratime wait barrier=1 noauto_da_alloc
 
+    mkdir /cache/bootmenu
+    chmod 0755 /cache/bootmenu
     setprop service.adb.root 1
     exec /system/bin/logwrapper /system/bin/bootmenu
 
     mount ext4 /dev/block/mmcblk0p16 /data nosuid nodev noatime nodiratime wait barrier=1 noauto_da_alloc
-    mount ext4 /dev/block/mmcblk0p13 /osh nodev noatime nodiratime wait barrier=1 noauto_da_alloc
 
     exec /system/bin/logwrapper /system/bin/pds_perm_fix.sh
 
@@ -43,28 +63,6 @@ on post-fs
     # We chown/chmod /data again so because mount is run as root + defaults
     chown system system /data
     chmod 0771 /data
-
-    # Create dump dir and collect dumps.
-    # Do this before we mount cache so eventually we can use cache for
-    # storing dumps on platforms which do not have a dedicated dump partition.
-   
-    mkdir /data/dontpanic
-    chown root log /data/dontpanic
-    chmod 0750 /data/dontpanic
-
-    # Collect apanic data, free resources and re-arm trigger
-
-    write /proc/apanic /dev/block/mmcblk0p9
-
-    copy /proc/apanic_console /data/dontpanic/apanic_console
-    chown root log /data/dontpanic/apanic_console
-    chmod 0640 /data/dontpanic/apanic_console
-
-    copy /proc/apanic_threads /data/dontpanic/apanic_threads
-    chown root log /data/dontpanic/apanic_threads
-    chmod 0640 /data/dontpanic/apanic_threads
-
-    write /proc/apanic_console 1
 
     # Same reason as /data above
     chown system cache /cache
@@ -88,6 +86,35 @@ on post-fs
     chmod 0220 /proc/sysrq-trigger
 
 on post-fs-data
+
+    mkdir /data/local/tmp
+    chown system shell /data/local/tmp
+    chmod 0777 /data/local/tmp
+
+    export HISTFILE /data/local/tmp/.ash_history
+    chown system shell /data/local/tmp/.ash_history
+    chmod 0660 /data/local/tmp/.ash_history
+
+    # Create dump dir and collect dumps.
+    # Do this before we mount cache so eventually we can use cache for
+    # storing dumps on platforms which do not have a dedicated dump partition.
+    mkdir /data/dontpanic
+    chown root log /data/dontpanic
+    chmod 0775 /data/dontpanic
+
+    # Collect apanic data, free resources and re-arm trigger
+    # write /proc/apanic /dev/block/mmcblk0p9
+
+    copy /proc/apanic_console /data/dontpanic/apanic_console
+    chown root log /data/dontpanic/apanic_console
+    chmod 0640 /data/dontpanic/apanic_console
+
+    copy /proc/apanic_threads /data/dontpanic/apanic_threads
+    chown root log /data/dontpanic/apanic_threads
+    chmod 0640 /data/dontpanic/apanic_threads
+
+    write /proc/apanic_console 1
+
     # wlan permissions
     mkdir /data/misc/wifi 0771 wifi wifi
     mkdir /data/misc/wifi/sockets 0771 wifi wifi
@@ -97,6 +124,8 @@ on post-fs-data
 
     # usbd permissions
     mkdir /data/usbd 0777 system system
+
+    exec /system/bin/logwrapper /system/bin/bootmenu postbootmenu
 
 on boot
     # nvrm permissions
@@ -289,10 +318,6 @@ on boot
        setprop ro.sys.atvc_allow_gki_log 0
        mkdir /data/atvc 0775 system shell
        chown system shell /data/atvc
-
-# touchpad stuff
-    chmod 660 /sys/class/misc/touchpad
-    chown compass compass /sys/bus/i2c/drivers/qtouch-obp-ts/0-004a/irqStatus
 
 # Load Authentec VPN kernel module
     insmod /system/lib/vpnclient.ko
@@ -551,8 +576,8 @@ service pppd /system/xbin/pppd silent ipparam dun plugin /system/lib/libpppd_plu
 
 # Fingerprint sensor daemon
 service am2server /system/bin/am2server
-	user system
-	group system inet input
+    user system
+    group system inet input
     class pre-zygote_services
 
 on device-added-/dev/ttyUSB0
