@@ -69,6 +69,7 @@ PRODUCT_PACKAGES += Usb \
 			hciconfig \
 			hcitool \
 			rilwrap \
+			tcpdump \
 			camera.olympus \
 			hwcomposer.default \
 			audio.primary.olympus \
@@ -84,6 +85,7 @@ PRODUCT_COPY_FILES += \
 # Board-specific init
 PRODUCT_COPY_FILES += \
     device/motorola/olympus/config/vold.fstab:system/etc/vold.fstab \
+    device/motorola/olympus/recovery/recovery.fstab:recovery/root/etc/recovery.fstab \
     device/motorola/olympus/scripts/postrecoveryboot.sh:recovery/root/sbin/postrecoveryboot.sh \
     device/motorola/olympus/prebuilts/liba2dp.so:system/lib/liba2dp.so \
     device/motorola/olympus/config/media_profiles.xml:system/etc/media_profiles.xml
@@ -127,7 +129,7 @@ PRODUCT_DEVICE := olympus
 PRODUCT_MODEL := MB860
 
 # Add DroidSSHd (dropbear) Management App - tpruvot/android_external_droidsshd @ github
-PRODUCT_PACKAGES += DroidSSHd dropbear dropbearkey sftp-server scp ssh
+PRODUCT_PACKAGES += DroidSSHd dropbear dropbearkey sftp-server scp ssh rsync
 PRODUCT_PACKAGES += RomUpdater
 
 # CM9 apps
