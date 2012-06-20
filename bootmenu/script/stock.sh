@@ -21,7 +21,9 @@ for cmd in $($BB --list); do
 done
 
 ## let /sbin for osh mount
-$BB mv /sbin /.sbin
+if [ -L /sbin ]; then
+    $BB mv /sbin /.sbin
+fi
 
 $BB mount -o remount,ro /
 

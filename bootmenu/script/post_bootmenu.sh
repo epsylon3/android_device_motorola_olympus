@@ -46,9 +46,11 @@ echo 1 > /sys/class/leds/button-backlight/brightness
 usleep 50000
 echo 0 > /sys/class/leds/button-backlight/brightness
 
-source $BM_ROOTDIR/script/adbd.sh
+#source $BM_ROOTDIR/script/adbd.sh
+setprop service.adb.root 1
+setprop persist.service.adb.enable 1
 
-exit 1
+exit 0
 
 fi
 
