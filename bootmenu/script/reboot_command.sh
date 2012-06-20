@@ -9,7 +9,7 @@ if [ -n "$2" ]; then
   R=$2
 fi
 
-if [ "$R" = "recovery" ]; then
+if [ "$R" = "recovery-dev" ]; then
 
   echo "recovery" > $BM_CONFIG
 
@@ -36,6 +36,10 @@ fi
 if [ -z "$R" ]; then
 
   rm -f $BM_CONFIG
+
+else
+
+  echo $R > $BM_CONFIG
 
 fi
 
