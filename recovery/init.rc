@@ -61,11 +61,6 @@ on boot
     exec /sbin/umount /system
     write /sys/class/leds/button-backlight/brightness 64
 
-    # custom repeat delay (epsy kernel)
-    write /proc/tegra-kbc/repeat_cycle 6000
-    write /proc/tegra-kbc/repeat_delay 4096
-    write /proc/tegra-kbc/repoll_time 32
-
     # in recovery, dmesg could report hung tasks (cpufreq-dvfsd)
     write /proc/sys/kernel/hung_task_timeout_secs 0
 
