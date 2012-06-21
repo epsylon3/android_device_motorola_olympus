@@ -21,6 +21,14 @@ $BB mount -o remount,rw /
 $BB mount -o remount,rw $PART_SYSTEM /system
 ##################################################
 
+## Double check /tmp exists
+if [ ! -e /tmp ]; then
+    mkdir /tmp
+    $BB mount -t ramfs ramfs /tmp
+    $BB chown system.shell /tmp
+    $BB chmod 0777 /tmp
+fi
+
 ## Run Init Script
 if [ -d $BM_ROOTDIR/init.d ]; then
     chmod 755 $BM_ROOTDIR/init.d/*
