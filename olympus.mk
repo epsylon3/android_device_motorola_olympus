@@ -64,10 +64,11 @@ $(call inherit-product, build/target/product/full_base_telephony.mk)
 
 PRODUCT_PACKAGES += Usb \
 			DockAudio \
-			Torch \
 			OlympusParts \
-			hciconfig \
+			Torch \
 			hcitool \
+			hciconfig \
+			screencap \
 			rilwrap \
 			tcpdump \
 			camera.olympus \
@@ -137,6 +138,9 @@ PRODUCT_PACKAGES += RomUpdater
 
 # CM9 apps
 PRODUCT_PACKAGES += Trebuchet FileManager Torch CMStats
+
+# Useless stuff for final zip, but help in builds
+PRODUCT_PACKAGES += libgtest_main libgtest ApiDemos
 
 $(call inherit-product-if-exists, device/motorola/olympus/bootmenu/bootmenu.mk)
 
