@@ -79,4 +79,12 @@ ro.authentec.fingerprint.jar=/system/framework/am2app.jar
 ro.authentec.fingerprint.so=/system/lib/libam2app.so
 
 # CRT animation speed
-debug.sf.electron_frames=26
+debug.sf.electron_frames=42
+
+# disable hw renderer by default for stability, except for chrome and browser
+hwui.whitelist=com.android.chrome:com.android.browser
+hwui.blacklist=0
+
+##hwui.whitelist=com.android.browser
+#hwui.blacklist=com.android.systemui:com.cyanogenmod.CMWallpapers:com.cyanogenmod.trebuchet
+
