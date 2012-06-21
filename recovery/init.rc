@@ -9,7 +9,7 @@ on init
     export EXTERNAL_STORAGE /sdcard
 
     # busybox history for "adb shell"
-    export HISTFILE /cache/bootmenu/.ash_history
+    export HISTFILE /tmp/.ash_history
     export HISTFILESIZE 1000
     export ENV /etc/profile
 
@@ -23,7 +23,10 @@ on init
     mkdir /data
     mkdir /cache
     mkdir /osh
-    mount ramfs /tmp /tmp
+
+    mkdir /tmp
+    mount ramfs ramfs /tmp
+    chmod 0777 /tmp
 
     mkdir /mnt
     symlink /sdcard /mnt/sdcard
