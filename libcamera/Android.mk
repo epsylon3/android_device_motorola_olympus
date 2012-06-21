@@ -26,6 +26,10 @@ LOCAL_SHARED_LIBRARIES += \
 
 include external/stlport/libstlport.mk
 
+ifeq ($(BOARD_CAMERA_CUSTOM_PARAMETERS),true)
+    LOCAL_CFLAGS += -DUSE_CUSTOM_PARAMETERS
+endif
+
 include $(BUILD_SHARED_LIBRARY)
 
 endif

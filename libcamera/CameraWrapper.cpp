@@ -24,37 +24,13 @@
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <hardware/camera.h>
 #include <camera/Camera.h>
 #include "CameraWrapper.h"
 
 namespace android {
 
 wp<CameraWrapper> CameraWrapper::singleton;
-
-static bool
-deviceCardMatches(const char *device, const char *matchCard)
-{
-    struct v4l2_capability caps;
-    int fd = ::open(device, O_RDWR);
-    bool ret;
-
-    if (fd < 0) {
-        return false;
-    }
-
-    if (::ioctl(fd, VIDIOC_QUERYCAP, &caps) < 0) {
-        ret = false;
-    } else {
-        const char *card = (const char *) caps.card;
-
-        LOGD("device %s card is %s\n", device, card);
-        ret = strstr(card, matchCard) != NULL;
-    }
-
-    ::close(fd);
-
-    return ret;
-}
 
 static sp<CameraHardwareInterface>
 openMotoInterface(const char *libName, const char *funcName, int id)
@@ -63,13 +39,30 @@ openMotoInterface(const char *libName, const char *funcName, int id)
     void *libHandle = ::dlopen(libName, RTLD_NOW);
 
     if (libHandle != NULL) {
+
+#if 0
+        typedef int (*GetInfosFunc)(int, struct camera_info*);
+        GetInfosFunc getinfos = (GetInfosFunc) ::dlsym(libHandle, "HAL_getCameraInfo");
+        if (getinfos != NULL) {
+            struct camera_info infos; infos.orientation=0; infos.facing=0;
+            getinfos(0, &infos);
+            LOGV("%s: camera 0 : orient=%d, side=%d", __FUNCTION__, infos.orientation, infos.facing);
+            getinfos(1, &infos);
+            LOGV("%s: camera 1 : orient=%d, side=%d", __FUNCTION__, infos.orientation, infos.facing);
+        } else {
+            LOGE("Could not find HAL_getNumberOfCameras in library!");
+        }
+#endif
         typedef sp<CameraHardwareInterface> (*OpenCamFunc)(int);
         OpenCamFunc func = (OpenCamFunc) ::dlsym(libHandle, funcName);
         if (func != NULL) {
             interface = func(id);
         } else {
             LOGE("Could not find library entry point!");
+            ::dlclose(libHandle);
+            return NULL;
         }
+
     } else {
         LOGE("dlopen() error: %s\n", dlerror());
     }
@@ -108,9 +101,12 @@ sp<CameraWrapper> CameraWrapper::createInstance(int cameraId)
     sp<CameraWrapper> hardware;
 
     if (stat("/system/lib/libnvmm_camera.so", &st) == 0) {
-        LOGI("Using NvOmx bayer device");
-        motoInterface = openMotoInterface("libcamera.so", "_ZN7android11NvOmxCamera14createInstanceEm", cameraId);
-        type = CAM_NVIDIA_BAYER;
+
+        LOGI("Using NvOmx HAL");
+        // works but...
+        //motoInterface = openMotoInterface("libcamera.so", "_ZN7android11NvOmxCamera14createInstanceEm", cameraId);
+        motoInterface = openMotoInterface("libcamera.so", "HAL_openCameraHardware", cameraId);
+        type = CAM_NVIDIA_HAL;
     }
 
     if (motoInterface != NULL) {
@@ -118,6 +114,7 @@ sp<CameraWrapper> CameraWrapper::createInstance(int cameraId)
         singleton = hardware;
     } else {
         LOGE("Could not open hardware interface");
+        hardware = NULL;
     }
 
     return hardware;
@@ -380,7 +377,7 @@ CameraWrapper::setParameters(const CameraParameters& params)
     status_t retval;
     int width, height;
     char buf[10];
-    bool is1080p;
+    bool isSlower;
 
     /*
      * getInt returns -1 if the value isn't present and 0 on parse failure,
@@ -389,14 +386,10 @@ CameraWrapper::setParameters(const CameraParameters& params)
     mVideoMode = pars.getInt("cam-mode") > 0;
     pars.remove("cam-mode");
 
-    pars.getPreviewSize(&width, &height);
-    is1080p = (width == 1920 && height == 1080);
+    pars.getPictureSize(&width, &height);
+    isSlower = (width == 2592 && height == 1944);
 
-    if (is1080p && !mVideoMode) {
-        pars.setPreviewFrameRate(14);
-    }
-    if (mCameraId == 1 && mVideoMode) {
-        // sample condition
+    if (isSlower && !mVideoMode) {
         pars.setPreviewFrameRate(14);
     }
 
@@ -417,18 +410,22 @@ CameraWrapper::setParameters(const CameraParameters& params)
 */
 
     mFlashMode = pars.get(CameraParameters::KEY_FLASH_MODE);
+
+#if 0
     float exposure = pars.getFloat(CameraParameters::KEY_EXPOSURE_COMPENSATION);
     /* exposure-compensation comes multiplied in the -9...9 range, while
        we need it in the -3...3 range -> adjust for that */
     exposure /= 3;
 
-    /* format the setting in a way the lib understands */
+    // format the setting in a way the lib understands
+
     bool even = (exposure - round(exposure)) < 0.05;
     snprintf(buf, sizeof(buf), even ? "%.0f" : "%.2f", exposure);
     pars.set("mot-exposure-offset", buf);
 
-    /* kill off the original setting */
+    // kill off the original setting
     pars.set(CameraParameters::KEY_EXPOSURE_COMPENSATION, "0");
+#endif
 
     retval = mMotoInterface->setParameters(pars);
 
@@ -495,5 +492,21 @@ CameraWrapper::dump(int fd, const Vector<String16>& args) const
 {
     return mMotoInterface->dump(fd, args);
 }
+
+#ifdef USE_CUSTOM_PARAMETERS
+status_t
+CameraWrapper::setCustomParameters(const CameraParameters& params)
+{
+    LOGD("%s", __FUNCTION__);
+    return CameraWrapper::setParameters(params);
+}
+
+CameraParameters
+CameraWrapper::getCustomParameters() const
+{
+    LOGD("%s", __FUNCTION__);
+    return CameraWrapper::getParameters();
+}
+#endif
 
 }; //namespace android

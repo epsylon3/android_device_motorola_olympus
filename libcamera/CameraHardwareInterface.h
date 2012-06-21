@@ -19,11 +19,14 @@
 
 #include <binder/IMemory.h>
 #include <utils/RefBase.h>
+#include <surfaceflinger/ISurface.h>
 #include <camera/Camera.h>
 #include <camera/CameraParameters.h>
 #include <ui/Overlay.h>
 
 namespace android {
+
+class Overlay;
 
 /**
  *  The size of image for display.
@@ -197,22 +200,43 @@ public:
     virtual CameraParameters  getParameters() const = 0; // 0x58
 
     /**
+     * Set/return custom camera parameters
+     */
+#ifdef USE_CUSTOM_PARAMETERS
+    virtual status_t    setCustomParameters(const CameraParameters& params) = 0; // 0x5C
+    virtual CameraParameters  getCustomParameters() const = 0; // 0x60
+#endif
+
+    /**
      * Send command to camera driver.
      */
-    virtual status_t sendCommand(int32_t cmd, int32_t arg1, int32_t arg2) = 0; // 0x5C
+    virtual status_t sendCommand(int32_t cmd, int32_t arg1, int32_t arg2) = 0; // 0x64
 
     /**
      * Release the hardware resources owned by this object.  Note that this is
      * *not* done in the destructor.
      */
-    virtual void release() = 0; // 0x60
+    virtual void release() = 0; // 0x68
 
     /**
      * Dump state of the camera hardware
      */
-    virtual status_t dump(int fd, const Vector<String16>& args) const = 0; // 0x64
+    virtual status_t dump(int fd, const Vector<String16>& args) const = 0; // 0x6C
 
 };
+
+/**
+ * The functions need to be provided by the camera HAL.
+ *
+ * If getNumberOfCameras() returns N, the valid cameraId for getCameraInfo()
+ * and openCameraHardware() is 0 to N-1.
+ */
+#if 0
+extern "C" int HAL_getNumberOfCameras();
+extern "C" void HAL_getCameraInfo(int cameraId, struct CameraInfo* cameraInfo);
+/* HAL should return NULL if it fails to open camera hardware. */
+extern "C" sp<CameraHardwareInterface> HAL_openCameraHardware(int cameraId);
+#endif
 
 };  // namespace android
 
