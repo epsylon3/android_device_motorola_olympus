@@ -389,9 +389,9 @@ CameraWrapper::setParameters(const CameraParameters& params)
     pars.getPictureSize(&width, &height);
     isSlower = (width == 2592 && height == 1944);
 
-    if (isSlower && !mVideoMode) {
-        pars.setPreviewFrameRate(14);
-    }
+//    if (isSlower && !mVideoMode) {
+//        pars.setPreviewFrameRate(14);
+//    }
 
 /*
     sceneMode = pars.get(CameraParameters::KEY_SCENE_MODE);
@@ -465,7 +465,7 @@ CameraWrapper::getParameters() const
     ret.set(CameraParameters::KEY_EXPOSURE_COMPENSATION_STEP, "0.3333333333333");
 */
 
-    ret.set(CameraParameters::KEY_VIDEO_FRAME_FORMAT, CameraParameters::PIXEL_FORMAT_YUV420P);
+//    ret.set(CameraParameters::KEY_VIDEO_FRAME_FORMAT, CameraParameters::PIXEL_FORMAT_YUV420P);
 //    ret.set(CameraParameters::KEY_SUPPORTED_PREVIEW_FPS_RANGE,
 //            "(14000,30000),(14000,30000),(14000,30000),(14000,30000),(14000,30000),(14000,30000),(14000,30000),(14000,30000),(14000,30000)");
 //    ret.set(CameraParameters::KEY_PREVIEW_FPS_RANGE, "10000, 30000");
