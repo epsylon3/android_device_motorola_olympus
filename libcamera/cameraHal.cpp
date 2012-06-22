@@ -57,6 +57,8 @@ struct legacy_camera_device {
     void                          *user;
     preview_stream_ops            *window;
 
+    bool                           autofocusAsked;
+
     // Old world
     sp<CameraWrapper>              hwif;
     gralloc_module_t const        *gralloc;
@@ -351,7 +353,7 @@ static void releaseCameraFrames(legacy_camera_device *lcdev)
 /* Hardware Camera interface handlers. */
 static int camera_set_preview_window(struct camera_device * device, struct preview_stream_ops *window)
 {
-    const int kBufferCount = 6;
+    const int kBufferCount = 4;
 
     int ret = -EINVAL;
     struct legacy_camera_device *lcdev = to_lcdev(device);
@@ -416,7 +418,7 @@ static int camera_set_preview_window(struct camera_device * device, struct previ
     lcdev->previewFormat = Overlay::getFormatFromString(previewFormat);
 
     if (window->set_usage(window, USAGE_WIN)) {
-        LOGE("%s: could not set usage on gralloc buffer", __FUNCTION__);
+        LOGE("%s: could not set usage on window buffer", __FUNCTION__);
         return -1;
     }
 
@@ -425,10 +427,18 @@ static int camera_set_preview_window(struct camera_device * device, struct previ
         return -1;
     }
 
+    if (window->set_usage(window, USAGE_WIN)) {
+        LOGE("%s: could not set usage on window buffer", __FUNCTION__);
+        return -1;
+    }
+
     if (lcdev->hwif->useOverlay()) {
-        LOGI("%s: Using overlay for device %p (%dx%d)", __FUNCTION__, lcdev, lcdev->previewWidth, lcdev->previewHeight);
+
+        LOGI("%s: Using overlay for device %p (%dx%d)", __FUNCTION__,
+            lcdev, lcdev->previewWidth, lcdev->previewHeight);
+
         lcdev->overlay = new Overlay(lcdev->previewWidth, lcdev->previewHeight,
-                Overlay::FORMAT_YUV420SP, overlayQueueBuffer, (void*) lcdev);
+                                     Overlay::FORMAT_YUV420SP, overlayQueueBuffer, (void*) lcdev);
 
         // Note: Tegra camera libs never use Overlay::enqueueBuffer, we need to do it here
         for (int i=0; i < kBufferCount - 1; i++) {
@@ -480,8 +490,8 @@ static void camera_disable_msg_type(struct camera_device * device, int32_t msg_t
 {
     struct legacy_camera_device *lcdev = to_lcdev(device);
     LOGV("%s: msg_type=0x%x", __FUNCTION__, msg_type);
-    if (msg_type == CAMERA_MSG_VIDEO_FRAME) {
-        LOGW("%s: releasing stale video frames", __FUNCTION__);
+    if (msg_type & (CAMERA_MSG_VIDEO_FRAME | CAMERA_MSG_PREVIEW_FRAME)) {
+        LOGW("%s: releasing staled video frames", __FUNCTION__);
         releaseCameraFrames(lcdev);
     }
     lcdev->hwif->disableMsgType(msg_type);
@@ -490,15 +500,17 @@ static void camera_disable_msg_type(struct camera_device * device, int32_t msg_t
 static int camera_msg_type_enabled(struct camera_device * device, int32_t msg_type)
 {
     struct legacy_camera_device *lcdev = to_lcdev(device);
-    LOGV("%s: msg_type=0x%x", __FUNCTION__, msg_type);
-    return lcdev->hwif->msgTypeEnabled(msg_type);
+    int ret = lcdev->hwif->msgTypeEnabled(msg_type);
+    LOGV("%s: msg_type=0x%x value=%d", __FUNCTION__, msg_type, ret);
+    return ret;
 }
 
 static int camera_start_preview(struct camera_device * device)
 {
     struct legacy_camera_device *lcdev = to_lcdev(device);
     LOGV("%s", __FUNCTION__);
-    lcdev->hwif->enableMsgType(CAMERA_MSG_PREVIEW_FRAME);
+    if (!camera_msg_type_enabled(device, CAMERA_MSG_PREVIEW_FRAME))
+        lcdev->hwif->enableMsgType(CAMERA_MSG_PREVIEW_FRAME);
     return lcdev->hwif->startPreview();
 }
 
@@ -506,6 +518,8 @@ static void camera_stop_preview(struct camera_device * device)
 {
     struct legacy_camera_device *lcdev = to_lcdev(device);
     LOGV("%s", __FUNCTION__);
+    if (camera_msg_type_enabled(device, CAMERA_MSG_PREVIEW_FRAME))
+        camera_disable_msg_type(device, CAMERA_MSG_PREVIEW_FRAME);
     lcdev->hwif->stopPreview();
     return;
 }
@@ -570,7 +584,8 @@ static int camera_auto_focus(struct camera_device * device)
 {
     struct legacy_camera_device *lcdev = to_lcdev(device);
     LOGV("%s", __FUNCTION__);
-    lcdev->hwif->autoFocus();
+    int ret = lcdev->hwif->autoFocus();
+    lcdev->autofocusAsked = true;
     return NO_ERROR;
 }
 
@@ -578,7 +593,8 @@ static int camera_cancel_auto_focus(struct camera_device * device)
 {
     struct legacy_camera_device *lcdev = to_lcdev(device);
     LOGV("%s", __FUNCTION__);
-    lcdev->hwif->cancelAutoFocus();
+    if (lcdev->autofocusAsked)
+        lcdev->hwif->cancelAutoFocus();
     return NO_ERROR;
 }
 
@@ -586,8 +602,7 @@ static int camera_take_picture(struct camera_device * device)
 {
     struct legacy_camera_device *lcdev = to_lcdev(device);
     LOGV("%s", __FUNCTION__);
-    lcdev->hwif->enableMsgType(CAMERA_MSG_POSTVIEW_FRAME |
-                               CAMERA_MSG_RAW_IMAGE | CAMERA_MSG_COMPRESSED_IMAGE);
+    lcdev->hwif->enableMsgType(CAMERA_MSG_POSTVIEW_FRAME | CAMERA_MSG_COMPRESSED_IMAGE);
     lcdev->hwif->takePicture();
     return NO_ERROR;
 }
@@ -619,16 +634,17 @@ static char* camera_get_parameters(struct camera_device * device)
     CameraParameters params(lcdev->hwif->getParameters());
 
     int width = 0, height = 0, w = 0, h = 0;
-
     params.getPreviewSize(&width, &height);
+
+#if 1
     params.getPictureSize(&w, &h);
     if (w > 0 && h > 0) {
         float ratio = (w * 1.0) / h;
 
-        // goal: use a lower resolution to enhance preview speed without HW_TEXTURE
-        //       the java window will stay stretched to his defined size...
-        //       so only a good ratio is important (VGA vs WIDE)
+        // Use a lower resolution to enhance the preview speed (without HW_TEXTURE)
 
+        // only a good ratio is important here (VGA vs WIDE)
+        //     the java window will stay stretched to his defined size...
         if (ratio > 1.55) {
             params.setPreviewSize(736, 480);
             params.set(CameraParameters::KEY_PREFERRED_PREVIEW_SIZE_FOR_VIDEO, "720x480");
@@ -643,8 +659,14 @@ static char* camera_get_parameters(struct camera_device * device)
     if (width != lcdev->previewWidth || height != lcdev->previewHeight) {
         LOGI("%s: change to preview size %dx%d => %dx%d", __FUNCTION__,
             lcdev->previewWidth, lcdev->previewHeight, width, height);
+
+        if (camera_msg_type_enabled(device, CAMERA_MSG_PREVIEW_FRAME)) {
+            camera_disable_msg_type(device, CAMERA_MSG_PREVIEW_FRAME);
+        }
+        camera_set_preview_window(device, NULL);
         camera_set_preview_window(device, lcdev->window);
     }
+#endif
 
 #ifdef LOG_FULL_PARAMS
     LOGV("%s: Parameters", __FUNCTION__);
@@ -766,6 +788,8 @@ static int camera_device_open(const hw_module_t* module, const char* name, hw_de
     camera_ops->dump                       = camera_dump;
 
     lcdev->id = cameraId;
+    lcdev->autofocusAsked = false;
+
     lcdev->hwif = CameraWrapper::createInstance(cameraId);
     if (lcdev->hwif == NULL) {
         free(camera_ops);
