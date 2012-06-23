@@ -20,10 +20,10 @@
 #define LOG_FULL_PARAMS
 //#define LOG_EACH_FRAME
 
-#include <hardware/camera.h>
-#include <ui/Overlay.h>
 #include <binder/IMemory.h>
+#include <hardware/camera.h>
 #include <hardware/gralloc.h>
+#include <camera/Overlay.h>
 #include <utils/Errors.h>
 #include <vector>
 

@@ -22,7 +22,7 @@
 #include <surfaceflinger/ISurface.h>
 #include <camera/Camera.h>
 #include <camera/CameraParameters.h>
-#include <ui/Overlay.h>
+#include <camera/Overlay.h>
 
 namespace android {
 
